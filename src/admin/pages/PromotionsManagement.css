@@ -1,0 +1,196 @@
+.promotions-management {
+    padding: 0;
+}
+
+.promotions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 2rem;
+}
+
+.promo-card {
+    background: white;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border-left: 4px solid #6366f1;
+    transition: all 0.3s ease;
+}
+
+.promo-card.inactive {
+    opacity: 0.6;
+    border-left-color: #9ca3af;
+}
+
+.promo-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+}
+
+.promo-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.promo-header h3 {
+    margin: 0;
+    color: #1f2937;
+}
+
+.toggle-btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 9999px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.875rem;
+}
+
+.toggle-btn.on {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.toggle-btn.off {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+.promo-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.promo-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.promo-info .label {
+    color: #6b7280;
+    font-size: 0.875rem;
+}
+
+.promo-info .value {
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.promo-info .value.discount {
+    font-size: 1.5rem;
+    color: #ef4444;
+}
+
+.promo-categories {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.category-tag {
+    background-color: #e0e7ff;
+    color: #4f46e5;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.promo-stats {
+    color: #6366f1;
+    font-weight: 600;
+    padding: 0.75rem;
+    background-color: #f3f4f6;
+    border-radius: 0.5rem;
+    text-align: center;
+}
+
+.promo-actions {
+    display: flex;
+    gap: 0.75rem;
+    padding-top: 1rem;
+    border-top: 1px solid #f3f4f6;
+}
+
+.btn-edit-promo,
+.btn-delete-promo {
+    flex: 1;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-edit-promo {
+    background-color: #dbeafe;
+    color: #1e40af;
+}
+
+.btn-edit-promo:hover {
+    background-color: #3b82f6;
+    color: white;
+}
+
+.btn-delete-promo {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+.btn-delete-promo:hover {
+    background-color: #ef4444;
+    color: white;
+}
+
+.promo-modal {
+    background: white;
+    border-radius: 1rem;
+    max-width: 600px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.promo-form {
+    padding: 1.5rem;
+}
+
+.categories-checkboxes {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+    padding: 1rem;
+    background-color: #f9fafb;
+    border-radius: 0.5rem;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+@media (max-width: 768px) {
+    .promotions-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .categories-checkboxes {
+        grid-template-columns: 1fr;
+    }
+}
