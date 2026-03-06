@@ -1,0 +1,386 @@
+.book-detail-page {
+    min-height: 100vh;
+    padding: 2rem 0;
+}
+
+.breadcrumb {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    color: #6b7280;
+}
+
+.breadcrumb-link {
+    color: #6366f1;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.breadcrumb-link:hover {
+    text-decoration: underline;
+}
+
+.book-detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: 3rem;
+    margin-bottom: 3rem;
+}
+
+.book-detail-image-wrapper {
+    position: relative;
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.book-detail-image {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.discount-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #dc2626;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 700;
+}
+
+.wishlist-btn {
+    width: 100%;
+    margin-top: 10px;
+    padding: 12px;
+    border: 2px solid #e5e7eb;
+    background: white;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.wishlist-btn:hover {
+    border-color: #dc2626;
+    background: #fef2f2;
+}
+
+.wishlist-btn.active {
+    background: #dc2626;
+    color: white;
+    border-color: #dc2626;
+}
+
+.book-category-badge {
+    display: inline-block;
+    background-color: #e0e7ff;
+    color: #4f46e5;
+    font-size: 0.875rem;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+}
+
+.book-detail-title {
+    font-size: 2.5rem;
+    font-family: 'Playfair Display', serif;
+    color: #1f2937;
+    margin: 0.5rem 0;
+}
+
+.book-detail-author {
+    font-size: 1.125rem;
+    color: #6b7280;
+}
+
+.book-rating-section {
+    display: flex;
+    gap: 1rem;
+    margin: 1rem 0;
+}
+
+.rating-stars {
+    font-size: 1.25rem;
+    color: #f59e0b;
+    font-weight: 600;
+}
+
+.book-price-section {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    padding: 1.5rem;
+    border-radius: 1rem;
+    margin: 1rem 0;
+}
+
+.current-price-large {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #dc2626;
+}
+
+.original-price-large {
+    font-size: 1.5rem;
+    color: #9ca3af;
+    text-decoration: line-through;
+    margin-left: 1rem;
+}
+
+.book-meta {
+    background-color: #f9fafb;
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    margin: 1rem 0;
+}
+
+.meta-item {
+    display: flex;
+    gap: 0.75rem;
+    margin: 0.5rem 0;
+}
+
+.meta-label {
+    font-weight: 600;
+    color: #6b7280;
+    min-width: 100px;
+}
+
+.meta-value.in-stock {
+    color: #059669;
+    font-weight: 600;
+}
+
+.meta-value.out-of-stock {
+    color: #dc2626;
+    font-weight: 600;
+}
+
+.purchase-controls {
+    margin-top: 1.5rem;
+}
+
+.quantity-selector {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.quantity-input-group {
+    display: flex;
+    background-color: #f3f4f6;
+    border-radius: 0.5rem;
+}
+
+.quantity-input-group button {
+    width: 48px;
+    height: 48px;
+    border: none;
+    background-color: #6366f1;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.quantity-input-group input {
+    width: 80px;
+    height: 48px;
+    border: none;
+    text-align: center;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.btn-large {
+    padding: 1rem 2rem;
+    font-size: 1.25rem;
+    width: 100%;
+}
+
+/* Tabs Section */
+.book-tabs {
+    margin: 3rem 0;
+}
+
+.tabs-header {
+    display: flex;
+    gap: 10px;
+    border-bottom: 2px solid #e5e7eb;
+    margin-bottom: 2rem;
+}
+
+.tabs-header .tab {
+    padding: 12px 24px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    color: #6b7280;
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s;
+    margin-bottom: -2px;
+}
+
+.tabs-header .tab:hover {
+    color: #6366f1;
+}
+
+.tabs-header .tab.active {
+    color: #6366f1;
+    border-bottom-color: #6366f1;
+}
+
+.tabs-content {
+    min-height: 300px;
+}
+
+/* Reviews Section */
+.review-form {
+    background: #f9fafb;
+    padding: 24px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+}
+
+.review-form h3 {
+    margin-bottom: 20px;
+    color: #1f2937;
+}
+
+.review-form .form-group {
+    margin-bottom: 15px;
+}
+
+.review-form label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #374151;
+}
+
+.review-form select,
+.review-form textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.review-form textarea {
+    resize: vertical;
+}
+
+.login-prompt {
+    text-align: center;
+    padding: 30px;
+    color: #6b7280;
+}
+
+.btn-link {
+    background: none;
+    border: none;
+    color: #6366f1;
+    cursor: pointer;
+    text-decoration: underline;
+    font-size: 16px;
+}
+
+.reviews-list {
+    margin-top: 30px;
+}
+
+.review-item {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 16px;
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.reviewer-name {
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.review-rating {
+    color: #f59e0b;
+}
+
+.review-comment {
+    color: #4b5563;
+    line-height: 1.6;
+    margin: 10px 0;
+}
+
+.review-date {
+    font-size: 12px;
+    color: #9ca3af;
+}
+
+.no-reviews {
+    text-align: center;
+    padding: 40px;
+    color: #9ca3af;
+    font-style: italic;
+}
+
+/* Loading & Error States */
+.loading-state,
+.error-state {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    margin: 0 auto 20px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #6366f1;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Related Books */
+.related-books-section {
+    padding: 3rem 0;
+    background-color: #f9fafb;
+}
+
+.related-books-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+@media (max-width: 1024px) {
+    .book-detail-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .book-detail-title {
+        font-size: 2rem;
+    }
+}
