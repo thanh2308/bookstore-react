@@ -101,11 +101,29 @@ export const getBook = async (req, res) => {
 // @access  Private/Admin
 export const createBook = async (req, res) => {
     try {
-        const bookData = { ...req.body };
+        // Trim keys để remove trailing spaces
+        const bookData = {};
+        for (const key in req.body) {
+            if (typeof req.body[key] === 'string') {
+                bookData[key.trim()] = req.body[key].trim();
+            } else {
+                bookData[key.trim()] = req.body[key];
+            }
+        }
 
-        // If file uploaded, add image path
-        if (req.file) {
-            bookData.image = `/uploads/books/${req.file.filename}`;
+        console.log('bookData after trim:', bookData);
+
+        // Convert string to number
+        if (bookData.price) bookData.price = Number(bookData.price);
+        if (bookData.originalPrice) bookData.originalPrice = Number(bookData.originalPrice);
+        if (bookData.stockQuantity) bookData.stockQuantity = Number(bookData.stockQuantity);
+
+        // Handle image - trim fieldname
+        if (req.files && req.files.length > 0) {
+            const imageFile = req.files.find(f => f.fieldname.trim() === 'image');
+            if (imageFile) {
+                bookData.image = imageFile.path;
+            }
         }
 
         const book = await Book.create(bookData);
@@ -115,13 +133,13 @@ export const createBook = async (req, res) => {
             book
         });
     } catch (error) {
+        console.error('Create book error:', error);
         res.status(500).json({
             success: false,
             message: error.message
         });
     }
 };
-
 // @desc    Update book
 // @route   PUT /api/books/:id
 // @access  Private/Admin
@@ -138,9 +156,14 @@ export const updateBook = async (req, res) => {
 
         const updateData = { ...req.body };
 
-        // If file uploaded, update image path
+        // Convert string to number
+        if (updateData.price) updateData.price = Number(updateData.price);
+        if (updateData.originalPrice) updateData.originalPrice = Number(updateData.originalPrice);
+        if (updateData.stockQuantity) updateData.stockQuantity = Number(updateData.stockQuantity);
+
+        // If file uploaded (Cloudinary), update image URL
         if (req.file) {
-            updateData.image = `/uploads/books/${req.file.filename}`;
+            updateData.image = req.file.path;
         }
 
         book = await Book.findByIdAndUpdate(req.params.id, updateData, {

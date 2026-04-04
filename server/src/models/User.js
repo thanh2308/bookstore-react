@@ -47,7 +47,25 @@ const userSchema = new mongoose.Schema({
         ref: 'Book'
     }],
     resetPasswordToken: String,
-    resetPasswordExpire: Date
+    resetPasswordExpire: Date,
+    avatar: {
+        type: String,
+        default: ''
+    },
+    loyaltyPoints: {
+        type: Number,
+        default: 0
+    },
+    phone: {
+        type: String,
+        validate: {
+            validator: function(v) {
+                if (!v) return true;
+                return /^(\+84|0)\d{9,10}$/.test(v);
+            },
+            message: 'Số điện thoại không hợp lệ'
+        }
+    }
 }, {
     timestamps: true
 });

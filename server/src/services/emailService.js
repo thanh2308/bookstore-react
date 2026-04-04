@@ -90,13 +90,14 @@ export const sendOrderConfirmation = async (order, user) => {
                         </tbody>
                     </table>
                     
+                    ${order.discount > 0 ? `<p><strong>Giảm giá:</strong> -${order.discount.toLocaleString('vi-VN')}₫ (Mã: ${order.promotionCode})</p>` : ''}
                     <p class="total">Tổng cộng: ${order.totalPrice.toLocaleString('vi-VN')}₫</p>
                     
                     <p>Chúng tôi sẽ liên hệ với bạn sớm nhất để xác nhận đơn hàng.</p>
                     <p>Hotline: 1900-xxxx</p>
                 </div>
                 <div class="footer">
-                    <p>© 2024 Cửa Hàng Sách. All rights reserved.</p>
+                    <p>© 2026 Cửa Hàng Sách. All rights reserved.</p>
                 </div>
             </div>
         </body>
@@ -150,7 +151,7 @@ export const sendOrderStatusUpdate = async (order, user) => {
                     <p>Cảm ơn bạn đã mua hàng tại Cửa Hàng Sách!</p>
                 </div>
                 <div class="footer">
-                    <p>© 2024 Cửa Hàng Sách. All rights reserved.</p>
+                    <p>© 2026 Cửa Hàng Sách. All rights reserved.</p>
                 </div>
             </div>
         </body>

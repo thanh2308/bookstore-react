@@ -21,7 +21,7 @@ router.get('/:id', getBook);
 router.post('/:id/reviews', protect, addReview);
 
 // Admin routes
-router.post('/', protect, adminOnly, upload.single('image'), createBook);
+router.post('/', protect, adminOnly, upload.any(), createBook);
 router.put('/:id', protect, adminOnly, upload.single('image'), updateBook);
 router.delete('/:id', protect, adminOnly, deleteBook);
 router.put('/:id/stock', protect, adminOnly, updateStock);

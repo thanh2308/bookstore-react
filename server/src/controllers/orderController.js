@@ -1,12 +1,13 @@
 import Order from '../models/Order.js';
 import Book from '../models/Book.js';
+import { sendOrderConfirmation, sendOrderStatusUpdate } from '../services/emailService.js';
 
 // @desc    Create new order
 // @route   POST /api/orders
 // @access  Private
 export const createOrder = async (req, res) => {
     try {
-        const { items, shippingAddress, paymentMethod, notes, customer } = req.body;
+        const { items, shippingAddress, paymentMethod, notes, customer, promotionCode } = req.body;
 
         if (!items || items.length === 0) {
             return res.status(400).json({
@@ -46,10 +47,28 @@ export const createOrder = async (req, res) => {
 
             itemsPrice += book.price * item.quantity;
 
-            // Reduce stock
             book.stockQuantity -= item.quantity;
             await book.save();
         }
+
+        let discount = 0;
+        let finalPromotionCode = null;
+
+        if (promotionCode) {
+            const { default: Promotion } = await import('../models/Promotion.js');
+            const promotion = await Promotion.findOne({ code: promotionCode.toUpperCase() });
+            
+            if (promotion && promotion.isValid() && itemsPrice >= promotion.minOrderValue) {
+                discount = promotion.calculateDiscount(itemsPrice);
+                finalPromotionCode = promotion.code;
+                
+                promotion.usedCount += 1;
+                promotion.usedBy.push({ user: req.user._id });
+                await promotion.save();
+            }
+        }
+
+        const totalPrice = itemsPrice - discount;
 
         const order = await Order.create({
             user: req.user._id,
@@ -63,13 +82,21 @@ export const createOrder = async (req, res) => {
             paymentMethod: paymentMethod || 'COD',
             itemsPrice,
             shippingPrice: 0,
-            totalPrice: itemsPrice,
+            totalPrice,
+            discount,
+            promotionCode: finalPromotionCode,
             notes
         });
 
         // Add to user's order history
         req.user.orderHistory.push(order._id);
         await req.user.save();
+
+        // Send confirmation email
+        sendOrderConfirmation(order, {
+            name: order.customer.name,
+            email: order.customer.email
+        }).catch(err => console.error('Email sending failed:', err));
 
         res.status(201).json({
             success: true,
@@ -211,7 +238,6 @@ export const updateOrderStatus = async (req, res) => {
             order.cancelledAt = Date.now();
             order.cancelReason = note;
 
-            // Restore stock
             for (const item of order.items) {
                 const book = await Book.findById(item.book);
                 if (book) {
@@ -222,6 +248,14 @@ export const updateOrderStatus = async (req, res) => {
         }
 
         await order.save();
+
+        const user = await import('../models/User.js').then(m => m.default.findById(order.user));
+        if (user) {
+            sendOrderStatusUpdate(order, {
+                name: user.name,
+                email: user.email
+            }).catch(err => console.error('Email sending failed:', err));
+        }
 
         res.status(200).json({
             success: true,
