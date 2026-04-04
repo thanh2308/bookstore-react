@@ -40,7 +40,7 @@ sleep 3
 
 # Start Frontend
 echo "🎨 Starting Frontend..."
-cd ..
+cd client
 if [ ! -d "node_modules" ]; then
     echo "📦 Installing frontend dependencies..."
     npm install
