@@ -2,7 +2,7 @@ import nodemailer from 'nodemailer';
 
 // Create transporter
 const createTransporter = () => {
-    return nodemailer.createTransporter({
+    return nodemailer.createTransport({
         host: process.env.SMTP_HOST,
         port: process.env.SMTP_PORT,
         secure: false,
@@ -163,6 +163,54 @@ export const sendOrderStatusUpdate = async (order, user) => {
         subject: `Cập nhật đơn hàng #${order.orderNumber}`,
         html
     });
+
+    
 };
 
-export default { sendOrderConfirmation, sendOrderStatusUpdate };
+// Gửi email chào mừng khi đăng ký thành công
+export const sendWelcomeEmail = async (user) => {
+    const html = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <h2 style="color: #4CAF50;">Chào mừng đến với Cửa Hàng Sách! 🎉</h2>
+            <p>Xin chào <strong>${user.name}</strong>,</p>
+            <p>Cảm ơn bạn đã đăng ký tài khoản. Chúng tôi rất vui được đồng hành cùng bạn trên con đường khám phá tri thức.</p>
+            <p>Hãy truy cập ngay website để tìm kiếm những cuốn sách yêu thích của bạn nhé!</p>
+            <p>Trân trọng,<br>Đội ngũ Cửa Hàng Sách</p>
+        </div>
+    `;
+
+    await sendEmail({
+        to: user.email,
+        subject: 'Chào mừng bạn đến với Cửa Hàng Sách',
+        html
+    });
+};
+
+// Gửi email reset mật khẩu
+export const sendResetPasswordEmail = async (user, resetUrl) => {
+    const html = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <h2 style="color: #f44336;">Yêu cầu đặt lại mật khẩu 🔒</h2>
+            <p>Xin chào <strong>${user.name}</strong>,</p>
+            <p>Bạn nhận được email này vì đã yêu cầu đặt lại mật khẩu cho tài khoản của mình.</p>
+            <p>Vui lòng click vào nút bên dưới để đặt lại mật khẩu (Link có hiệu lực trong 10 phút):</p>
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="${resetUrl}" style="background-color: #f44336; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">Đặt lại mật khẩu</a>
+            </div>
+            <p>Nếu bạn không yêu cầu, vui lòng bỏ qua email này và mật khẩu của bạn sẽ được giữ nguyên.</p>
+        </div>
+    `;
+
+    await sendEmail({
+        to: user.email,
+        subject: 'Yêu cầu đặt lại mật khẩu',
+        html
+    });
+};
+
+export default { 
+    sendOrderConfirmation, 
+    sendOrderStatusUpdate,
+    sendWelcomeEmail,
+    sendResetPasswordEmail
+};

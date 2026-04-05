@@ -66,6 +66,19 @@ export const updateUserProfile = createAsyncThunk(
     }
 );
 
+export const fetchCurrentUser = createAsyncThunk(
+    'auth/fetchCurrentUser',
+    async (_, { rejectWithValue }) => {
+        try {
+            // Gọi hàm getMe từ authService
+            const data = await authService.getMe();
+            return data;
+        } catch (error) {
+            return rejectWithValue(error.message);
+        }
+    }
+);
+
 const authSlice = createSlice({
     name: 'auth',
     initialState: loadAuthFromStorage(),
@@ -126,6 +139,10 @@ const authSlice = createSlice({
             .addCase(updateUserProfile.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
+            })
+            .addCase(fetchCurrentUser.fulfilled, (state, action) => {
+                state.user = action.payload.user;
+                localStorage.setItem('user', JSON.stringify(action.payload.user));
             });
     }
 });

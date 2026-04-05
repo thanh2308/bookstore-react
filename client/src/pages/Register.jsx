@@ -10,6 +10,9 @@ const Register = () => {
     const navigate = useNavigate();
     const { success, error: showToastError } = useToast();
     const { isAuthenticated, loading, error } = useSelector(state => state.auth);
+    const [agreeTerms, setAgreeTerms] = useState(false);
+    const [showPassword, setShowPassword] = useState(false); // Cho ô Mật khẩu
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false); // Cho ô Xác nhận mật khẩu
 
     const [formData, setFormData] = useState({
         name: '',
@@ -45,6 +48,11 @@ const Register = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        if (!agreeTerms) {
+            setValidationError('Bạn phải đồng ý với Điều khoản dịch vụ để tiếp tục');
+            return;
+        }
+
         // Validation
         if (formData.password !== formData.confirmPassword) {
             setValidationError('Mật khẩu xác nhận không khớp');
@@ -58,6 +66,18 @@ const Register = () => {
 
         const { name, email, password } = formData;
         dispatch(registerUser({ name, email, password }));
+    };
+
+    const eyeButtonStyle = {
+        position: 'absolute',
+        right: '10px',
+        top: '50%',
+        transform: 'translateY(-50%)',
+        background: 'none',
+        border: 'none',
+        cursor: 'pointer',
+        padding: 0,
+        zIndex: 1, 
     };
 
     return (
@@ -97,32 +117,67 @@ const Register = () => {
 
                         <div className="form-group">
                             <label htmlFor="password">Mật khẩu</label>
-                            <input
-                                type="password"
-                                id="password"
-                                name="password"
-                                value={formData.password}
-                                onChange={handleChange}
-                                required
-                                placeholder="••••••••"
-                                minLength="6"
-                                disabled={loading}
-                            />
+                            <div style={{ position: 'relative' }}>
+                                <input
+                                    type={showPassword ? "text" : "password"} 
+                                    id="password"
+                                    name="password"
+                                    value={formData.password}
+                                    onChange={handleChange}
+                                    required
+                                    placeholder="••••••••"
+                                    minLength="6"
+                                    disabled={loading}
+                                    style={{ width: '100%', paddingRight: '40px' }} 
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    style={eyeButtonStyle}
+                                >
+                                    {showPassword ? '👁️‍🗨️' : '👁️'}
+                                </button>
+                            </div>
                         </div>
 
                         <div className="form-group">
                             <label htmlFor="confirmPassword">Xác nhận mật khẩu</label>
-                            <input
-                                type="password"
-                                id="confirmPassword"
-                                name="confirmPassword"
-                                value={formData.confirmPassword}
-                                onChange={handleChange}
-                                required
-                                placeholder="••••••••"
-                                minLength="6"
+                            {/* Bọc input bằng div relative */}
+                            <div style={{ position: 'relative' }}>
+                                <input
+                                    type={showConfirmPassword ? "text" : "password"} 
+                                    id="confirmPassword"
+                                    name="confirmPassword"
+                                    value={formData.confirmPassword}
+                                    onChange={handleChange}
+                                    required
+                                    placeholder="••••••••"
+                                    minLength="6"
+                                    disabled={loading}
+                                    style={{ width: '100%', paddingRight: '40px' }}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                    style={eyeButtonStyle}
+                                >
+                                    {showConfirmPassword ? '👁️‍🗨️' : '👁️'}
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '15px' }}>
+                            <input 
+                                type="checkbox" 
+                                id="terms" 
+                                checked={agreeTerms}
+                                onChange={(e) => setAgreeTerms(e.target.checked)}
                                 disabled={loading}
+                                style={{ cursor: 'pointer' }}
                             />
+                            <label htmlFor="terms" style={{ margin: 0, cursor: 'pointer', fontSize: '14px' }}>
+                                Tôi đồng ý với <Link to="/terms" style={{ color: '#007bff' }}>Điều khoản dịch vụ</Link>
+                            </label>
                         </div>
 
                         {validationError && (

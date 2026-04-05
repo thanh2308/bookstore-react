@@ -1,5 +1,6 @@
 import User from '../models/User.js';
-
+import crypto from 'crypto';
+import emailService from '../services/emailService.js'; 
 // @desc    Register new user
 // @route   POST /api/auth/register
 // @access  Public
@@ -29,6 +30,13 @@ export const register = async (req, res) => {
 
         // Generate token
         const token = user.generateToken();
+
+        try {
+            await emailService.sendWelcomeEmail(user);
+        } catch (emailError) {
+            console.error('Lỗi gửi email chào mừng:', emailError);
+        }
+        // --------------------------------------------------
 
         res.status(201).json({
             success: true,
@@ -201,5 +209,98 @@ export const changePassword = async (req, res) => {
             success: false,
             message: error.message
         });
+    }
+};
+
+// @desc    Gửi email quên mật khẩu
+// @route   POST /api/auth/forgot-password
+// @access  Public
+export const forgotPassword = async (req, res) => {
+    try {
+        const user = await User.findOne({ email: req.body.email });
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'Không tìm thấy người dùng với email này'
+            });
+        }
+
+        // 1. Tạo chuỗi token ngẫu nhiên (chưa mã hóa) để gửi qua email
+        const resetToken = crypto.randomBytes(20).toString('hex');
+
+        // 2. Mã hóa token và lưu vào database (để đối chiếu sau này)
+        user.resetPasswordToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+        
+        // 3. Đặt thời gian hết hạn cho token (10 phút)
+        user.resetPasswordExpire = Date.now() + 10 * 60 * 1000;
+        await user.save({ validateBeforeSave: false });
+
+        // 4. Tạo URL gửi vào email (Trỏ về trang Frontend mà bạn sẽ làm ở React)
+        const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
+
+        try {
+            // Gọi hàm gửi email
+            await emailService.sendResetPasswordEmail(user, resetUrl);
+
+            res.status(200).json({
+                success: true,
+                message: 'Email khôi phục mật khẩu đã được gửi'
+            });
+        } catch (error) {
+            // Nếu gửi mail lỗi, xóa token trong DB đi
+            user.resetPasswordToken = undefined;
+            user.resetPasswordExpire = undefined;
+            await user.save({ validateBeforeSave: false });
+
+            return res.status(500).json({
+                success: false,
+                message: 'Không thể gửi email, vui lòng thử lại sau'
+            });
+        }
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+// @desc    Đặt lại mật khẩu mới
+// @route   POST /api/auth/reset-password/:token
+// @access  Public
+export const resetPassword = async (req, res) => {
+    try {
+        // 1. Lấy token từ URL (req.params.token) và mã hóa lại để so sánh với DB
+        const resetPasswordToken = crypto.createHash('sha256').update(req.params.token).digest('hex');
+
+        // 2. Tìm user có mã token khớp và thời gian chưa hết hạn
+        const user = await User.findOne({
+            resetPasswordToken,
+            resetPasswordExpire: { $gt: Date.now() } // $gt: greater than (lớn hơn thời gian hiện tại)
+        });
+
+        if (!user) {
+            return res.status(400).json({
+                success: false,
+                message: 'Mã khôi phục không hợp lệ hoặc đã hết hạn'
+            });
+        }
+
+        // 3. Cập nhật mật khẩu mới (nhờ file User.js nó sẽ tự động băm)
+        user.password = req.body.password;
+
+        // Xóa bỏ token khôi phục
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpire = undefined;
+        await user.save();
+
+        // 4. Tự động đăng nhập cho user sau khi đổi pass thành công
+        const token = user.generateToken();
+
+        res.status(200).json({
+            success: true,
+            message: 'Đặt lại mật khẩu thành công',
+            token
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
     }
 };

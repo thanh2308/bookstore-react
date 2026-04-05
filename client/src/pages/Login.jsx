@@ -10,6 +10,7 @@ const Login = () => {
     const navigate = useNavigate();
     const { success, error: showToastError } = useToast();
     const { isAuthenticated, loading, error } = useSelector(state => state.auth);
+    const [showPassword, setShowPassword] = useState(false);
 
     const [formData, setFormData] = useState({
         email: '',
@@ -19,7 +20,7 @@ const Login = () => {
     useEffect(() => {
         if (isAuthenticated) {
             success('Đăng nhập thành công!');
-            navigate('/');
+            navigate('/');a
         }
     }, [isAuthenticated, navigate, success]);
 
@@ -65,17 +66,27 @@ const Login = () => {
 
                         <div className="form-group">
                             <label htmlFor="password">Mật khẩu</label>
-                            <input
-                                type="password"
-                                id="password"
-                                name="password"
-                                value={formData.password}
-                                onChange={handleChange}
-                                required
-                                placeholder="••••••••"
-                                minLength="6"
-                                disabled={loading}
-                            />
+                            <div style={{ display: 'flex', position: 'relative' }}>
+                                <input
+                                    type={showPassword ? "text" : "password"} 
+                                    id="password"
+                                    name="password"
+                                    value={formData.password}
+                                    onChange={handleChange}
+                                    required
+                                    placeholder="••••••••"
+                                    minLength="6"
+                                    disabled={loading}
+                                    style={{ width: '100%' }}
+                                />
+                                <button 
+                                    type="button" 
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer' }}
+                                >
+                                    {showPassword ? '👁️‍🗨️' : '👁️'}
+                                </button>
+                            </div>
                         </div>
 
                         <button
