@@ -17,9 +17,7 @@ const BookDetail = () => {
     const { loading, error } = useSelector(state => state.books);
     const { isAuthenticated, user } = useSelector(state => state.auth);
     const { wishlist } = useSelector(state => state.wishlist);
-    const book = useSelector(state =>
-        state.books.allBooks.find(b => (b._id || b.id) === id || b.id === parseInt(id))
-    );
+    const book = useSelector(state => state.books.currentBook);
 
     const relatedBooks = useSelector(state =>
         state.books.allBooks.filter(b =>
@@ -32,10 +30,8 @@ const BookDetail = () => {
     const [reviewForm, setReviewForm] = useState({ rating: 5, comment: '' });
 
     useEffect(() => {
-        if (!book) {
-            dispatch(fetchBookById(id));
-        }
-    }, [id, dispatch, book]);
+        dispatch(fetchBookById(id));
+    }, [id, dispatch]);
 
     const isInWishlist = wishlist.some(w => w === id || w._id === id);
 
@@ -62,14 +58,37 @@ const BookDetail = () => {
 
     const handleReviewSubmit = async (e) => {
         e.preventDefault();
+
         if (!isAuthenticated) {
             navigate('/login');
             return;
         }
-        const result = await dispatch(addBookReview({ id, reviewData: reviewForm }));
+
+        if (!reviewForm.comment.trim()) {
+            alert('Vui lòng nhập nhận xét');
+            return;
+        }
+
+        const result = await dispatch(
+            addBookReview({
+                id,
+                reviewData: {
+                    rating: Number(reviewForm.rating),
+                    comment: reviewForm.comment.trim()
+                }
+            })
+        );
+
+        console.log('Review result:', result);
+
         if (addBookReview.fulfilled.match(result)) {
             success('Đánh giá đã được gửi!');
             setReviewForm({ rating: 5, comment: '' });
+
+            // load lại review mới
+            dispatch(fetchBookById(id));
+        } else {
+            alert(result.payload || 'Không gửi được đánh giá');
         }
     };
 
@@ -84,12 +103,17 @@ const BookDetail = () => {
         );
     }
 
-    if (error || !book) {
+    if (!loading && (error || !book)) {
         return (
             <div className="container">
                 <div className="error-state">
                     <p>❌ {error || 'Không tìm thấy sách'}</p>
-                    <button onClick={() => navigate('/')} className="btn btn-primary">Về trang chủ</button>
+                    <button
+                        onClick={() => navigate('/')}
+                        className="btn btn-primary"
+                    >
+                        Về trang chủ
+                    </button>
                 </div>
             </div>
         );
@@ -118,7 +142,7 @@ const BookDetail = () => {
                             onClick={handleToggleWishlist}
                             className={`wishlist-btn ${isInWishlist ? 'active' : ''}`}
                         >
-                            {isInWishlist ? '❤️ Đã yêu thích' : '🤍 Thêm vào yêu thích'}
+                            {isInWishlist ? '❤️' : '🤍'}
                         </button>
                     </div>
 

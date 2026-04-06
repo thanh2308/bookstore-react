@@ -44,61 +44,101 @@
     margin-top: 1rem;
 }
 
-.order-summary {
-    background-color: white;
-    border-radius: 1rem;
-    padding: 2rem;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-    position: sticky;
-    top: 100px;
+.order-total-section {
+    margin-top: 1rem;
+}
+
+/* Divider đẹp hơn */
+.order-divider {
+    height: 1px;
+    background: linear-gradient(to right, transparent, #e5e7eb, transparent);
+    margin: 1rem 0;
+}
+
+/* Dòng giảm giá */
+.order-row.discount span:last-child {
+    color: #ef4444;
+    font-weight: 600;
+}
+
+/* Free text */
+.free-text {
+    color: #10b981;
+    font-weight: 600;
+}
+
+/* Tổng tiền nổi bật hơn */
+.order-row.total {
+    font-size: 1.3rem;
+    font-weight: 700;
+    padding-top: 1rem;
+    border-top: 2px dashed #e5e7eb;
+}
+
+.total-price {
+    color: #ee4d2d;
+    font-size: 1.8rem;
+    font-weight: 800;
+}
+
+/* Hover nhẹ cho item */
+.order-item {
+    transition: 0.2s;
+}
+
+.order-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.08);
 }
 
 .order-items {
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    max-height: 400px;
+    max-height: 350px;
+    /* chiều cao để xuất hiện scroll */
     overflow-y: auto;
+    padding-right: 5px;
+    /* tránh che nội dung */
     margin: 1rem 0;
 }
 
-.order-item {
-    display: flex;
-    gap: 1rem;
-    padding: 1rem;
-    background-color: #f9fafb;
-    border-radius: 0.5rem;
+.order-items::-webkit-scrollbar {
+    width: 6px;
+}
+
+.order-items::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.order-items::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #ddd, #bbb);
+    border-radius: 10px;
+}
+
+.order-items::-webkit-scrollbar-thumb:hover {
+    background: #999;
+}
+
+.order-items {
+    scroll-behavior: smooth;
+}
+
+.order-items {
+    flex: 1;
+    /* chiếm phần còn lại */
 }
 
 .order-item img {
-    width: 60px;
-    height: 80px;
+    width: 80px;
+    /* chiều ngang */
+    height: 200px;
+    /* chiều cao cố định 200px */
     object-fit: cover;
-    border-radius: 0.375rem;
-}
-
-.order-item-title {
-    font-weight: 600;
-    font-size: 0.9rem;
-    margin: 0;
-}
-
-.order-item-price {
-    font-weight: 700;
-    color: #6366f1;
-}
-
-.order-row {
-    display: flex;
-    justify-content: space-between;
-    margin: 0.75rem 0;
-}
-
-.order-row.total {
-    font-size: 1.25rem;
-    font-weight: 700;
-    padding-top: 1rem;
-    border-top: 1px solid #e5e7eb;
+    /* ảnh fill đẹp, không méo */
+    border-radius: 8px;
+    background-color: #f3f4f6;
+    /* màu nền nếu ảnh lỗi */
 }
 
 .total-price {
@@ -143,6 +183,21 @@
     margin: 2rem 0;
 }
 
+.order-summary {
+    background-color: white;
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+
+    position: sticky;
+    top: 100px;
+
+    max-height: 85vh;
+    /* giới hạn chiều cao */
+    display: flex;
+    flex-direction: column;
+}
+
 @media (max-width: 1024px) {
     .checkout-layout {
         grid-template-columns: 1fr;
@@ -155,4 +210,43 @@
     .form-row {
         grid-template-columns: 1fr;
     }
+}
+
+
+.voucher {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.voucher select {
+    flex: 1;
+    padding: 12px;
+    border-radius: 10px;
+    border: 2px solid #eee;
+    font-size: 14px;
+    outline: none;
+    transition: 0.2s;
+    background: #fff;
+}
+
+.voucher select:focus {
+    border-color: #ee4d2d;
+    box-shadow: 0 0 0 3px rgba(238, 77, 45, 0.15);
+}
+
+.voucher button {
+    padding: 0 18px;
+    border-radius: 10px;
+    border: none;
+    background: linear-gradient(135deg, #ee4d2d, #ff7337);
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.25s;
+}
+
+.voucher button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(238, 77, 45, 0.3);
 }

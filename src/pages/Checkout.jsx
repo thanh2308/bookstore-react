@@ -27,6 +27,47 @@ const Checkout = () => {
     const [paymentMethod, setPaymentMethod] = useState('COD');
     const [submitted, setSubmitted] = useState(false);
 
+    const [voucher, setVoucher] = useState('');
+    const [discount, setDiscount] = useState(0);
+
+    const applyVoucher = () => {
+        let discountValue = 0;
+
+        if (voucher === 'SALE10') {
+            discountValue = totalPrice * 0.1;
+        } else if (voucher === 'SALE20') {
+            discountValue = totalPrice * 0.2;
+        } else if (voucher === 'FREESHIP') {
+            discountValue = 0;
+        } else {
+            showToastError('Mã không hợp lệ');
+            return;
+        }
+
+        setDiscount(discountValue);
+
+        // ✅ Lưu localStorage
+        localStorage.setItem(
+            'voucher',
+            JSON.stringify({
+                code: voucher,
+                discount: discountValue
+            })
+        );
+
+        // ✅ Toast
+        success(`Áp dụng mã ${voucher} thành công!`);
+    };
+
+    useEffect(() => {
+        const saved = localStorage.getItem('voucher');
+        if (saved) {
+            const data = JSON.parse(saved);
+            setVoucher(data.code);
+            setDiscount(data.discount);
+        }
+    }, []);
+
     // Redirect if not authenticated
     useEffect(() => {
         if (!isAuthenticated) {
@@ -60,6 +101,13 @@ const Checkout = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        // ❗ Check tồn kho trước
+        for (let item of cart) {
+            if (item.quantity > item.countInStock) {
+                showToastError(`"${item.title}" chỉ còn ${item.countInStock} sản phẩm`);
+                return;
+            }
+        }
         // Create order object matching backend schema
         const orderData = {
             customer: {
@@ -81,7 +129,7 @@ const Checkout = () => {
             paymentMethod: paymentMethod,
             itemsPrice: totalPrice,
             shippingPrice: 0,
-            totalPrice: totalPrice,
+            totalPrice: finalTotal,
             notes: shippingInfo.notes || ''
         };
 
@@ -135,6 +183,8 @@ const Checkout = () => {
     if (cart.length === 0) {
         return null;
     }
+
+    const finalTotal = totalPrice - discount;
 
     return (
         <div className="checkout-page">
@@ -260,6 +310,23 @@ const Checkout = () => {
                                 />
                             </div>
 
+                            {/* Voucher */}
+                            <div className="voucher">
+                                <select
+                                    value={voucher}
+                                    onChange={(e) => setVoucher(e.target.value)}
+                                >
+                                    <option value="">-- Chọn mã giảm giá --</option>
+                                    <option value="SALE10">SALE10 - Giảm 10%</option>
+                                    <option value="SALE20">SALE20 - Giảm 20%</option>
+                                    <option value="FREESHIP">FREESHIP - Miễn phí vận chuyển</option>
+                                </select>
+
+                                <button type="button" onClick={applyVoucher}>
+                                    Áp dụng
+                                </button>
+                            </div>
+
                             <button
                                 type="submit"
                                 className="btn btn-primary submit-btn"
@@ -292,14 +359,24 @@ const Checkout = () => {
                                 <span>Tạm tính:</span>
                                 <span>{totalPrice.toLocaleString('vi-VN')}₫</span>
                             </div>
+
                             <div className="order-row">
                                 <span>Phí vận chuyển:</span>
                                 <span className="free-text">Miễn phí</span>
                             </div>
+
+                            {discount > 0 && (
+                                <div className="order-row discount">
+                                    <span>Giảm giá:</span>
+                                    <span>-{discount.toLocaleString('vi-VN')}₫</span>
+                                </div>
+                            )}
+
                             <div className="order-divider"></div>
+
                             <div className="order-row total">
                                 <span>Tổng cộng:</span>
-                                <span className="total-price">{totalPrice.toLocaleString('vi-VN')}₫</span>
+                                <span className="total-price">{finalTotal.toLocaleString('vi-VN')}₫</span>
                             </div>
                         </div>
                     </div>

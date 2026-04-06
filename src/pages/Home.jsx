@@ -1,6 +1,11 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { setSearchQuery, setCategory, setSortBy, fetchBooks } from '../redux/booksSlice';
+import {
+    setSearchQuery,
+    setCategory,
+    setSortBy,
+    fetchBooks
+} from '../redux/booksSlice';
 import BookCard from '../components/BookCard';
 import './Home.css';
 
@@ -17,6 +22,7 @@ const Home = () => {
         error
     } = useSelector(state => state.books);
 
+    const [searchInput, setSearchInput] = useState(searchQuery);
     // Fetch books on mount and when filters change
     useEffect(() => {
         const filters = {
@@ -41,6 +47,14 @@ const Home = () => {
         dispatch(setSortBy(sort));
     };
 
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            dispatch(setSearchQuery(searchInput));
+        }, 500);
+
+        return () => clearTimeout(timer);
+    }, [searchInput, dispatch]);
+
     return (
         <div className="home-page">
             {/* Hero Section */}
@@ -54,8 +68,8 @@ const Home = () => {
                             <input
                                 type="text"
                                 placeholder="Tìm kiếm sách theo tên hoặc tác giả..."
-                                value={searchQuery}
-                                onChange={(e) => handleSearch(e.target.value)}
+                                value={searchInput}
+                                onChange={(e) => setSearchInput(e.target.value)}
                                 className="search-input"
                             />
                             <span className="search-icon">🔍</span>

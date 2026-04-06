@@ -6,6 +6,12 @@ import './CartItem.css';
 const CartItem = ({ item }) => {
     const dispatch = useDispatch();
 
+    const handleIncrease = () => {
+        // ❗ Chặn vượt tồn kho
+        if (item.quantity >= item.countInStock) return;
+        dispatch(increaseQuantity(item.id));
+    };
+
     return (
         <div className="cart-item">
             <img src={item.image} alt={item.title} className="cart-item-image" />
@@ -13,7 +19,15 @@ const CartItem = ({ item }) => {
             <div className="cart-item-details">
                 <h3 className="cart-item-title">{item.title}</h3>
                 <p className="cart-item-author">{item.author}</p>
-                <p className="cart-item-price">{item.price.toLocaleString('vi-VN')}₫</p>
+
+                {/* ✅ Hiển thị tồn kho */}
+                <p className="stock">
+                    Còn lại: {item.countInStock}
+                </p>
+
+                <p className="cart-item-price">
+                    {item.price.toLocaleString('vi-VN')}₫
+                </p>
             </div>
 
             <div className="cart-item-controls">
@@ -25,17 +39,28 @@ const CartItem = ({ item }) => {
                     >
                         −
                     </button>
+
                     <span className="quantity-display">{item.quantity}</span>
-                    <button onClick={() => dispatch(increaseQuantity(item.id))} className="quantity-btn">
+
+                    <button
+                        onClick={handleIncrease}
+                        className="quantity-btn"
+                        disabled={item.quantity >= item.countInStock} // ❗ disable luôn
+                    >
                         +
                     </button>
                 </div>
 
                 <div className="cart-item-total">
-                    <span className="total-price">{item.totalPrice.toLocaleString('vi-VN')}₫</span>
+                    <span className="total-price">
+                        {(item.price * item.quantity).toLocaleString('vi-VN')}₫
+                    </span>
                 </div>
 
-                <button onClick={() => dispatch(removeFromCart(item.id))} className="remove-btn">
+                <button
+                    onClick={() => dispatch(removeFromCart(item.id))}
+                    className="remove-btn"
+                >
                     🗑️ Xóa
                 </button>
             </div>

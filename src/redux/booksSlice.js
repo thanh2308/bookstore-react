@@ -4,6 +4,7 @@ import bookService from '../services/bookService';
 const initialState = {
     allBooks: [],
     filteredBooks: [],
+    currentBook: null,
     selectedCategory: 'Tất cả',
     searchQuery: '',
     sortBy: 'default',
@@ -15,7 +16,9 @@ const initialState = {
     total: 0
 };
 
-// Async thunks
+// =================== Async thunks ===================
+
+// Lấy danh sách sách
 export const fetchBooks = createAsyncThunk(
     'books/fetchBooks',
     async (filters, { rejectWithValue }) => {
@@ -28,6 +31,7 @@ export const fetchBooks = createAsyncThunk(
     }
 );
 
+// Lấy chi tiết 1 sách theo id
 export const fetchBookById = createAsyncThunk(
     'books/fetchById',
     async (id, { rejectWithValue }) => {
@@ -40,6 +44,7 @@ export const fetchBookById = createAsyncThunk(
     }
 );
 
+// Tạo sách mới
 export const createBook = createAsyncThunk(
     'books/create',
     async (bookData, { rejectWithValue }) => {
@@ -52,6 +57,7 @@ export const createBook = createAsyncThunk(
     }
 );
 
+// Cập nhật sách
 export const updateBook = createAsyncThunk(
     'books/update',
     async ({ id, bookData }, { rejectWithValue }) => {
@@ -64,6 +70,7 @@ export const updateBook = createAsyncThunk(
     }
 );
 
+// Xóa sách
 export const deleteBook = createAsyncThunk(
     'books/delete',
     async (id, { rejectWithValue }) => {
@@ -76,6 +83,7 @@ export const deleteBook = createAsyncThunk(
     }
 );
 
+// Thêm đánh giá
 export const addBookReview = createAsyncThunk(
     'books/addReview',
     async ({ id, reviewData }, { rejectWithValue }) => {
@@ -87,6 +95,8 @@ export const addBookReview = createAsyncThunk(
         }
     }
 );
+
+// =================== Slice ===================
 
 const booksSlice = createSlice({
     name: 'books',
@@ -111,26 +121,44 @@ const booksSlice = createSlice({
             state.error = null;
         }
     },
+
     extraReducers: (builder) => {
         builder
-            // Fetch books
+            // ===== Fetch all books =====
             .addCase(fetchBooks.pending, (state) => {
                 state.loading = true;
                 state.error = null;
             })
             .addCase(fetchBooks.fulfilled, (state, action) => {
                 state.loading = false;
-                state.allBooks = action.payload.books;
-                state.filteredBooks = action.payload.books;
-                state.currentPage = action.payload.currentPage;
-                state.totalPages = action.payload.totalPages;
-                state.total = action.payload.total;
+                state.allBooks = action.payload.books || [];
+                state.filteredBooks = action.payload.books || [];
+                state.currentPage = action.payload.currentPage || 1;
+                state.totalPages = action.payload.totalPages || 1;
+                state.total = action.payload.total || 0;
             })
             .addCase(fetchBooks.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
             })
-            // Create book
+
+            // ===== Fetch book by ID =====
+            .addCase(fetchBookById.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+                state.currentBook = null;
+            })
+            .addCase(fetchBookById.fulfilled, (state, action) => {
+                state.loading = false;
+                state.currentBook = action.payload.book || action.payload;
+            })
+            .addCase(fetchBookById.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+                state.currentBook = null;
+            })
+
+            // ===== Create book =====
             .addCase(createBook.pending, (state) => {
                 state.loading = true;
                 state.error = null;
@@ -143,30 +171,46 @@ const booksSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload;
             })
-            // Update book
+
+            // ===== Update book =====
             .addCase(updateBook.pending, (state) => {
                 state.loading = true;
                 state.error = null;
             })
             .addCase(updateBook.fulfilled, (state, action) => {
                 state.loading = false;
-                const index = state.allBooks.findIndex(b => b._id === action.payload.book._id);
+
+                const updatedBook = action.payload.book;
+                const index = state.allBooks.findIndex(
+                    (b) => b._id === updatedBook._id
+                );
+
                 if (index >= 0) {
-                    state.allBooks[index] = action.payload.book;
+                    state.allBooks[index] = updatedBook;
+                }
+
+                if (
+                    state.currentBook &&
+                    state.currentBook._id === updatedBook._id
+                ) {
+                    state.currentBook = updatedBook;
                 }
             })
             .addCase(updateBook.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
             })
-            // Delete book
+
+            // ===== Delete book =====
             .addCase(deleteBook.pending, (state) => {
                 state.loading = true;
                 state.error = null;
             })
             .addCase(deleteBook.fulfilled, (state, action) => {
                 state.loading = false;
-                state.allBooks = state.allBooks.filter(b => b._id !== action.payload);
+                state.allBooks = state.allBooks.filter(
+                    (b) => b._id !== action.payload
+                );
             })
             .addCase(deleteBook.rejected, (state, action) => {
                 state.loading = false;
@@ -185,4 +229,3 @@ export const {
 } = booksSlice.actions;
 
 export default booksSlice.reducer;
-

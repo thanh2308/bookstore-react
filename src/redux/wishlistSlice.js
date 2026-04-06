@@ -1,10 +1,18 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import userService from '../services/userService';
 
+// Lấy wishlist đã lưu
+const savedWishlist = localStorage.getItem('wishlist');
+
 const initialState = {
-    wishlist: [],
+    wishlist: savedWishlist ? JSON.parse(savedWishlist) : [],
     loading: false,
     error: null
+};
+
+// Hàm lưu localStorage
+const saveWishlist = (wishlist) => {
+    localStorage.setItem('wishlist', JSON.stringify(wishlist));
 };
 
 // Async thunks
@@ -38,8 +46,14 @@ const wishlistSlice = createSlice({
     reducers: {
         clearError: (state) => {
             state.error = null;
+        },
+
+        clearWishlist: (state) => {
+            state.wishlist = [];
+            localStorage.removeItem('wishlist');
         }
     },
+
     extraReducers: (builder) => {
         builder
             // Fetch wishlist
@@ -49,20 +63,25 @@ const wishlistSlice = createSlice({
             })
             .addCase(fetchWishlist.fulfilled, (state, action) => {
                 state.loading = false;
-                state.wishlist = action.payload.wishlist;
+                state.wishlist = action.payload.wishlist || [];
+
+                saveWishlist(state.wishlist);
             })
             .addCase(fetchWishlist.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
             })
-            // Toggle wishlist item
+
+            // Toggle wishlist
             .addCase(toggleWishlistItem.pending, (state) => {
                 state.loading = true;
                 state.error = null;
             })
             .addCase(toggleWishlistItem.fulfilled, (state, action) => {
                 state.loading = false;
-                state.wishlist = action.payload.wishlist;
+                state.wishlist = action.payload.wishlist || [];
+
+                saveWishlist(state.wishlist);
             })
             .addCase(toggleWishlistItem.rejected, (state, action) => {
                 state.loading = false;
@@ -71,5 +90,9 @@ const wishlistSlice = createSlice({
     }
 });
 
-export const { clearError } = wishlistSlice.actions;
+export const {
+    clearError,
+    clearWishlist
+} = wishlistSlice.actions;
+
 export default wishlistSlice.reducer;
