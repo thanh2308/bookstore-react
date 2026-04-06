@@ -4,31 +4,31 @@ export const orderService = {
     // Create new order
     createOrder: async (orderData) => {
         const response = await api.post('/orders', orderData);
-        return response.data;
+        return response.data.order;
     },
 
     // Get my orders
     getMyOrders: async () => {
         const response = await api.get('/orders/myorders');
-        return response.data;
+        return response.data.orders;
     },
 
     // Get order by ID
     getOrderById: async (id) => {
         const response = await api.get(`/orders/${id}`);
-        return response.data;
+        return response.data.order;
     },
 
     // Cancel order
     cancelOrder: async (id, reason) => {
         const response = await api.put(`/orders/${id}/cancel`, { reason });
-        return response.data;
+        return response.data.order;
     },
 
     // Update payment status
     updatePayment: async (id, paymentData) => {
         const response = await api.put(`/orders/${id}/pay`, paymentData);
-        return response.data;
+        return response.data.order;
     },
 
     // Get all orders (Admin)
@@ -46,13 +46,13 @@ export const orderService = {
         }
 
         const response = await api.get(`/orders?${params.toString()}`);
-        return response.data;
+        return response.data.orders;
     },
 
     // Update order status (Admin)
     updateOrderStatus: async (id, status, note) => {
         const response = await api.put(`/orders/${id}/status`, { status, note });
-        return response.data;
+        return response.data.order;
     }
 };
 

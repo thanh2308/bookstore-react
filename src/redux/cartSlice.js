@@ -23,26 +23,33 @@ const cartSlice = createSlice({
         addToCart: (state, action) => {
             const newItem = action.payload;
             const itemId = newItem._id || newItem.id;
-
             const addedQuantity = newItem.quantity || 1;
+
+            // Check hết hàng NGAY từ đầu
+            if (!newItem.stockQuantity || newItem.stockQuantity === 0) {
+                return; // (nếu có toast thì gọi ở component)
+            }
 
             const existingItem = state.items.find(
                 item => (item._id || item.id) === itemId
             );
 
             if (existingItem) {
-                // ❗ Chặn vượt tồn kho
                 const newQuantity = existingItem.quantity + addedQuantity;
 
-                if (newQuantity > existingItem.countInStock) {
-                    existingItem.quantity = existingItem.countInStock;
-                } else {
-                    existingItem.quantity = newQuantity;
-                }
+                existingItem.quantity =
+                    newQuantity > existingItem.stockQuantity
+                        ? existingItem.stockQuantity
+                        : newQuantity;
 
                 existingItem.totalPrice =
                     existingItem.price * existingItem.quantity;
             } else {
+                const validQuantity =
+                    addedQuantity > newItem.stockQuantity
+                        ? newItem.stockQuantity
+                        : addedQuantity;
+
                 state.items.push({
                     _id: itemId,
                     id: itemId,
@@ -50,24 +57,13 @@ const cartSlice = createSlice({
                     author: newItem.author,
                     price: newItem.price,
                     image: newItem.image,
-
-                    // ❗ QUAN TRỌNG
-                    countInStock: newItem.countInStock,
-
-                    quantity:
-                        addedQuantity > newItem.countInStock
-                            ? newItem.countInStock
-                            : addedQuantity,
-
-                    totalPrice:
-                        newItem.price *
-                        (addedQuantity > newItem.countInStock
-                            ? newItem.countInStock
-                            : addedQuantity)
+                    stockQuantity: newItem.stockQuantity,
+                    quantity: validQuantity,
+                    totalPrice: newItem.price * validQuantity
                 });
             }
 
-            // ❗ Tính lại toàn bộ cho chắc (tránh sai số)
+            // Tính lại tổng
             state.totalQuantity = state.items.reduce(
                 (total, item) => total + item.quantity,
                 0

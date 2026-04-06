@@ -180,27 +180,33 @@ const BookDetail = () => {
                             </div>
                         </div>
 
-                        {book.inStock && (
-                            <div className="purchase-controls">
-                                <div className="quantity-selector">
-                                    <label>Số lượng:</label>
-                                    <div className="quantity-input-group">
-                                        <button onClick={() => setQuantity(Math.max(1, quantity - 1))}>−</button>
-                                        <input
-                                            type="number"
-                                            value={quantity}
-                                            onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
-                                            min="1"
-                                        />
-                                        <button onClick={() => setQuantity(quantity + 1)}>+</button>
+                        <div className="purchase-controls">
+                            {book.inStock ? (
+                                <>
+                                    <div className="quantity-selector">
+                                        <label>Số lượng:</label>
+                                        <div className="quantity-input-group">
+                                            <button onClick={() => setQuantity(Math.max(1, quantity - 1))}>−</button>
+                                            <input
+                                                type="number"
+                                                value={quantity}
+                                                onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                                                min="1"
+                                            />
+                                            <button onClick={() => setQuantity(quantity + 1)}>+</button>
+                                        </div>
                                     </div>
-                                </div>
 
-                                <button onClick={handleAddToCart} className="btn btn-primary btn-large">
-                                    🛒 Thêm vào giỏ hàng
+                                    <button onClick={handleAddToCart} className="btn btn-primary btn-large">
+                                        🛒 Thêm vào giỏ hàng
+                                    </button>
+                                </>
+                            ) : (
+                                <button className="btn btn-secondary btn-large" disabled>
+                                    ✗ Hết hàng
                                 </button>
-                            </div>
-                        )}
+                            )}
+                        </div>
                     </div>
                 </div>
 

@@ -85,6 +85,20 @@ const OrderDetail = () => {
         );
     }
 
+    // Ensure order object has required properties
+    if (!order || typeof order !== 'object') {
+        return (
+            <div className="container">
+                <div className="error-state">
+                    <p>❌ Dữ liệu đơn hàng không hợp lệ</p>
+                    <button onClick={() => navigate('/my-orders')} className="btn btn-primary">
+                        Về danh sách đơn hàng
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
     const canCancel = order.status === 'pending' || order.status === 'confirmed';
 
     return (
@@ -95,13 +109,13 @@ const OrderDetail = () => {
                         <button onClick={() => navigate('/my-orders')} className="back-btn">
                             ← Quay lại
                         </button>
-                        <h1>Đơn hàng #{order.orderNumber}</h1>
+                        <h1>Đơn hàng #{order.orderNumber || 'N/A'}</h1>
                         <span className={`badge ${getStatusBadgeClass(order.status)}`}>
-                            {getStatusText(order.status)}
+                            {getStatusText(order.status || 'pending')}
                         </span>
                     </div>
                     <div className="order-date">
-                        Đặt ngày: {new Date(order.createdAt).toLocaleDateString('vi-VN')}
+                        Đặt ngày: {order.createdAt ? new Date(order.createdAt).toLocaleDateString('vi-VN') : 'N/A'}
                     </div>
                 </div>
 
@@ -110,18 +124,22 @@ const OrderDetail = () => {
                     <div className="order-section">
                         <h2>Trạng thái đơn hàng</h2>
                         <div className="status-timeline">
-                            {order.statusHistory?.map((item, index) => (
-                                <div key={index} className="timeline-item">
-                                    <div className="timeline-marker"></div>
-                                    <div className="timeline-content">
-                                        <div className="timeline-status">{getStatusText(item.status)}</div>
-                                        <div className="timeline-date">
-                                            {new Date(item.date).toLocaleString('vi-VN')}
+                            {order.statusHistory?.length > 0 ? (
+                                order.statusHistory.map((item, index) => (
+                                    <div key={index} className="timeline-item">
+                                        <div className="timeline-marker"></div>
+                                        <div className="timeline-content">
+                                            <div className="timeline-status">{getStatusText(item.status)}</div>
+                                            <div className="timeline-date">
+                                                {item.date ? new Date(item.date).toLocaleString('vi-VN') : 'N/A'}
+                                            </div>
+                                            {item.note && <div className="timeline-note">{item.note}</div>}
                                         </div>
-                                        {item.note && <div className="timeline-note">{item.note}</div>}
                                     </div>
-                                </div>
-                            ))}
+                                ))
+                            ) : (
+                                <p className="no-history">Chưa có lịch sử trạng thái cho đơn hàng này.</p>
+                            )}
                         </div>
                     </div>
 
@@ -129,31 +147,38 @@ const OrderDetail = () => {
                     <div className="order-section">
                         <h2>Sản phẩm</h2>
                         <div className="order-items">
-                            {order.items.map((item, index) => (
-                                <div key={index} className="order-item-detail">
-                                    <img src={item.image || '/placeholder-book.jpg'} alt={item.title} />
-                                    <div className="item-info">
-                                        <h3>{item.title}</h3>
-                                        <p className="item-meta">Số lượng: {item.quantity}</p>
-                                        <p className="item-price">{item.price.toLocaleString('vi-VN')}₫</p>
+                            {order.items && order.items.length > 0 ? (
+                                order.items.map((item, index) => (
+                                    <div key={index} className="order-item-detail">
+                                        <img src={item.image || '/placeholder-book.jpg'} alt={item.title} />
+                                        <div className="item-info">
+                                            <h3>{item.title}</h3>
+                                            <p className="item-meta">Số lượng: {item.quantity}</p>
+                                            <p className="item-price">{(item.price || 0).toLocaleString('vi-VN')}₫</p>
+                                        </div>
+                                        <div className="item-total">
+                                            {((item.price || 0) * (item.quantity || 0)).toLocaleString('vi-VN')}₫
+                                        </div>
                                     </div>
-                                    <div className="item-total">
-                                        {(item.price * item.quantity).toLocaleString('vi-VN')}₫
-                                    </div>
-                                </div>
-                            ))}
+                                ))
+                            ) : (
+                                <p>Không có sản phẩm nào trong đơn hàng.</p>
+                            )}
                         </div>
                     </div>
 
                     {/* Shipping Address */}
                     <div className="order-section">
-                        <h2>Địa chỉ giao hàng</h2>
+                        <h2>Thông tin giao hàng</h2>
                         <div className="address-box">
-                            <p><strong>{order.shippingAddress.fullName}</strong></p>
-                            <p>{order.shippingAddress.phone}</p>
-                            <p>{order.shippingAddress.email}</p>
-                            <p>{order.shippingAddress.address}</p>
-                            <p>{order.shippingAddress.city}</p>
+                            <p><strong>Họ tên:</strong> {order.customer?.name || 'N/A'}</p>
+                            <p><strong>Email:</strong> {order.customer?.email || 'N/A'}</p>
+                            <p><strong>Số điện thoại:</strong> {order.customer?.phone || 'N/A'}</p>
+                            <p><strong>Địa chỉ:</strong> {order.shippingAddress?.address || 'N/A'}</p>
+                            <p><strong>Thành phố:</strong> {order.shippingAddress?.city || 'N/A'}</p>
+                            {order.notes && (
+                                <p><strong>Ghi chú:</strong> {order.notes}</p>
+                            )}
                         </div>
                     </div>
 
@@ -163,26 +188,26 @@ const OrderDetail = () => {
                         <div className="payment-summary">
                             <div className="summary-row">
                                 <span>Tạm tính:</span>
-                                <span>{order.itemsPrice?.toLocaleString('vi-VN')}₫</span>
+                                <span>{(order.itemsPrice || 0).toLocaleString('vi-VN')}₫</span>
                             </div>
                             <div className="summary-row">
                                 <span>Phí vận chuyển:</span>
-                                <span>{order.shippingPrice?.toLocaleString('vi-VN')}₫</span>
+                                <span>{(order.shippingPrice || 0).toLocaleString('vi-VN')}₫</span>
                             </div>
                             {order.discount > 0 && (
                                 <div className="summary-row discount">
                                     <span>Giảm giá:</span>
-                                    <span>-{order.discount.toLocaleString('vi-VN')}₫</span>
+                                    <span>-{(order.discount || 0).toLocaleString('vi-VN')}₫</span>
                                 </div>
                             )}
                             <div className="summary-row total">
                                 <strong>Tổng cộng:</strong>
                                 <strong className="total-price">
-                                    {order.totalPrice.toLocaleString('vi-VN')}₫
+                                    {(order.totalPrice || 0).toLocaleString('vi-VN')}₫
                                 </strong>
                             </div>
                             <div className="payment-method-info">
-                                <p>Phương thức: <strong>{order.paymentMethod === 'COD' ? 'Thanh toán khi nhận hàng' : order.paymentMethod}</strong></p>
+                                <p>Phương thức: <strong>{order.paymentMethod === 'COD' ? 'Thanh toán khi nhận hàng' : (order.paymentMethod || 'COD')}</strong></p>
                                 <p>Trạng thái thanh toán: <span className={order.isPaid ? 'paid' : 'unpaid'}>
                                     {order.isPaid ? '✅ Đã thanh toán' : '⏳ Chưa thanh toán'}
                                 </span></p>

@@ -29,6 +29,7 @@ const Checkout = () => {
 
     const [voucher, setVoucher] = useState('');
     const [discount, setDiscount] = useState(0);
+    const [isVoucherApplied, setIsVoucherApplied] = useState(false);
 
     const applyVoucher = () => {
         let discountValue = 0;
@@ -46,7 +47,6 @@ const Checkout = () => {
 
         setDiscount(discountValue);
 
-        // ✅ Lưu localStorage
         localStorage.setItem(
             'voucher',
             JSON.stringify({
@@ -55,7 +55,6 @@ const Checkout = () => {
             })
         );
 
-        // ✅ Toast
         success(`Áp dụng mã ${voucher} thành công!`);
     };
 
@@ -65,6 +64,7 @@ const Checkout = () => {
             const data = JSON.parse(saved);
             setVoucher(data.code);
             setDiscount(data.discount);
+            setIsVoucherApplied(true);
         }
     }, []);
 
@@ -101,15 +101,24 @@ const Checkout = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // ❗ Check tồn kho trước
+        // Kiểm tra tồn kho...
         for (let item of cart) {
-            if (item.quantity > item.countInStock) {
-                showToastError(`"${item.title}" chỉ còn ${item.countInStock} sản phẩm`);
+            const stock = item.stockQuantity ?? item.countInStock ?? 0;
+            if (stock === 0) {
+                showToastError(`"${item.title}" đã hết hàng`);
+                return;
+            }
+            if (item.quantity > stock) {
+                showToastError(`"${item.title}" chỉ còn ${stock} sản phẩm`);
                 return;
             }
         }
-        // Create order object matching backend schema
+
+        // Tính tổng cuối cùng trước khi tạo orderData
+        const finalTotal = totalPrice - discount;
+
         const orderData = {
+            orderNumber: `ORD-${Date.now()}`,
             customer: {
                 name: shippingInfo.fullName,
                 email: shippingInfo.email,
@@ -134,19 +143,11 @@ const Checkout = () => {
         };
 
         try {
-            // Dispatch create order action
             const result = await dispatch(createOrder(orderData)).unwrap();
-
-            // Clear cart on success
             dispatch(clearCart());
             setSubmitted(true);
-
             success('Đặt hàng thành công!');
-
-            // Navigate to success page after delay
-            setTimeout(() => {
-                navigate('/orders');
-            }, 2000);
+            setTimeout(() => navigate('/my-orders'), 2000);
         } catch (err) {
             console.error('Order creation failed:', err);
             showToastError(err.message || 'Đặt hàng thất bại. Vui lòng thử lại!');
@@ -312,19 +313,46 @@ const Checkout = () => {
 
                             {/* Voucher */}
                             <div className="voucher">
+                                <label>Chọn mã giảm giá</label>
+
                                 <select
                                     value={voucher}
-                                    onChange={(e) => setVoucher(e.target.value)}
+                                    onChange={(e) => {
+                                        const newVoucher = e.target.value;
+                                        setVoucher(newVoucher);
+
+                                        let discountValue = 0;
+
+                                        if (newVoucher === 'SALE10') {
+                                            discountValue = totalPrice * 0.1;
+                                        } else if (newVoucher === 'SALE20') {
+                                            discountValue = totalPrice * 0.2;
+                                        } else if (newVoucher === 'FREESHIP') {
+                                            discountValue = 0;
+                                        }
+
+                                        setDiscount(discountValue);
+
+                                        // lưu localStorage luôn
+                                        localStorage.setItem(
+                                            'voucher',
+                                            JSON.stringify({
+                                                code: newVoucher,
+                                                discount: discountValue
+                                            })
+                                        );
+                                    }}
                                 >
-                                    <option value="">-- Chọn mã giảm giá --</option>
+                                    <option value=""> Chọn voucher </option>
                                     <option value="SALE10">SALE10 - Giảm 10%</option>
                                     <option value="SALE20">SALE20 - Giảm 20%</option>
-                                    <option value="FREESHIP">FREESHIP - Miễn phí vận chuyển</option>
                                 </select>
 
-                                <button type="button" onClick={applyVoucher}>
-                                    Áp dụng
-                                </button>
+                                {voucher && (
+                                    <p className="voucher-applied">
+                                        Đã áp dụng: <strong>{voucher}</strong>
+                                    </p>
+                                )}
                             </div>
 
                             <button

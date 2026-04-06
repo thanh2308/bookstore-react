@@ -6,7 +6,7 @@ import Book from '../models/Book.js';
 // @access  Private
 export const createOrder = async (req, res) => {
     try {
-        const { items, shippingAddress, paymentMethod, notes, customer } = req.body;
+        const { items, shippingAddress, paymentMethod, notes, customer, orderNumber, totalPrice: finalTotal, itemsPrice: requestItemsPrice } = req.body;
 
         if (!items || items.length === 0) {
             return res.status(400).json({
@@ -52,6 +52,7 @@ export const createOrder = async (req, res) => {
         }
 
         const order = await Order.create({
+            orderNumber,
             user: req.user._id,
             customer: customer || {
                 name: req.user.name,
@@ -61,9 +62,9 @@ export const createOrder = async (req, res) => {
             items: orderItems,
             shippingAddress,
             paymentMethod: paymentMethod || 'COD',
-            itemsPrice,
+            itemsPrice: requestItemsPrice || itemsPrice,
             shippingPrice: 0,
-            totalPrice: itemsPrice,
+            totalPrice: finalTotal || itemsPrice,
             notes
         });
 

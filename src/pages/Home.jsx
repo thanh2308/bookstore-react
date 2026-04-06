@@ -4,9 +4,11 @@ import {
     setSearchQuery,
     setCategory,
     setSortBy,
+    setPage,
     fetchBooks
 } from '../redux/booksSlice';
 import BookCard from '../components/BookCard';
+import Pagination from '../components/Pagination';
 import './Home.css';
 
 const categories = ['Tất cả', 'Kỹ năng sống', 'Tiểu thuyết', 'Khoa học', 'Kinh tế', 'Văn học Việt Nam', 'Thiếu nhi'];
@@ -19,7 +21,10 @@ const Home = () => {
         selectedCategory,
         sortBy,
         loading,
-        error
+        error,
+        currentPage,
+        totalPages,
+        total
     } = useSelector(state => state.books);
 
     const [searchInput, setSearchInput] = useState(searchQuery);
@@ -29,11 +34,11 @@ const Home = () => {
             category: selectedCategory,
             search: searchQuery,
             sortBy: sortBy,
-            page: 1,
+            page: currentPage,
             limit: 20
         };
         dispatch(fetchBooks(filters));
-    }, [dispatch, selectedCategory, searchQuery, sortBy]);
+    }, [dispatch, selectedCategory, searchQuery, sortBy, currentPage]);
 
     const handleSearch = (value) => {
         dispatch(setSearchQuery(value));
@@ -43,8 +48,8 @@ const Home = () => {
         dispatch(setCategory(category));
     };
 
-    const handleSortChange = (sort) => {
-        dispatch(setSortBy(sort));
+    const handlePageChange = (page) => {
+        dispatch(setPage(page));
     };
 
     useEffect(() => {
@@ -139,6 +144,17 @@ const Home = () => {
                         <div className="no-books">
                             <p>📚 Không tìm thấy sách nào</p>
                         </div>
+                    )}
+
+                    {/* Pagination */}
+                    {totalPages > 1 && (
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={handlePageChange}
+                            totalItems={total}
+                            itemsPerPage={20}
+                        />
                     )}
                 </div>
             </section>

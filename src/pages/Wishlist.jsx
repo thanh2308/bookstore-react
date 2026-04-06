@@ -13,7 +13,6 @@ const Wishlist = () => {
 
     const { wishlist, loading, error } = useSelector(state => state.wishlist);
     const { isAuthenticated } = useSelector(state => state.auth);
-    // No need for allBooks anymore since wishlist is populated
 
     useEffect(() => {
         if (!isAuthenticated) {
@@ -23,13 +22,10 @@ const Wishlist = () => {
         dispatch(fetchWishlist());
     }, [dispatch, isAuthenticated, navigate]);
 
-    // Handle both populated objects and ID strings
     const wishlistBooks = (wishlist || []).map(item => {
-        // If item is already an object (populated), use it
         if (typeof item === 'object' && item !== null) {
             return item;
         }
-        // If item is ID string (fallback), unlikely with new backend but safe to keep logic clean
         return null;
     }).filter(Boolean);
 
@@ -117,14 +113,13 @@ const Wishlist = () => {
                                 </div>
 
                                 <div className="wishlist-item-actions">
-                                    {book.inStock && (
-                                        <button
-                                            onClick={() => handleAddToCart(book)}
-                                            className="btn btn-primary"
-                                        >
-                                            🛒 Thêm vào giỏ hàng
-                                        </button>
-                                    )}
+                                    <button
+                                        onClick={() => handleAddToCart(book)}
+                                        className={`btn ${book.inStock ? 'btn-primary' : 'btn-secondary'}`}
+                                        disabled={!book.inStock}
+                                    >
+                                        {book.inStock ? '🛒 Thêm vào giỏ hàng' : 'Hết hàng'}
+                                    </button>
                                     <button
                                         onClick={() => handleViewDetails(book._id || book.id)}
                                         className="btn btn-outline"

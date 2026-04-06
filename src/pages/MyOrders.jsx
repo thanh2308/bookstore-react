@@ -1,12 +1,23 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { fetchMyOrders } from '../redux/ordersSlice';
 import './MyOrders.css';
 
+const statusOptions = [
+    { value: 'all', label: 'Tất cả' },
+    { value: 'pending', label: 'Chờ xác nhận' },
+    { value: 'confirmed', label: 'Đã xác nhận' },
+    { value: 'processing', label: 'Đang xử lý' },
+    { value: 'shipping', label: 'Đang giao' },
+    { value: 'delivered', label: 'Đã giao' },
+    { value: 'cancelled', label: 'Đã hủy' }
+];
+
 const MyOrders = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const [statusFilter, setStatusFilter] = useState('all');
     const { myOrders, loading, error } = useSelector(state => state.orders);
     const { isAuthenticated } = useSelector(state => state.auth);
 
@@ -17,6 +28,12 @@ const MyOrders = () => {
         }
         dispatch(fetchMyOrders());
     }, [dispatch, isAuthenticated, navigate]);
+
+    const filteredOrders = statusFilter === 'all'
+        ? myOrders
+        : myOrders.filter(order => order.status === statusFilter);
+
+    const hasOrders = myOrders.length > 0;
 
     const getStatusBadgeClass = (status) => {
         const statusClasses = {
@@ -77,7 +94,21 @@ const MyOrders = () => {
             <div className="container">
                 <h1>Đơn Hàng Của Tôi</h1>
 
-                {myOrders.length === 0 ? (
+                {hasOrders && (
+                    <div className="order-filters">
+                        {statusOptions.map(option => (
+                            <button
+                                key={option.value}
+                                className={`status-filter-btn ${statusFilter === option.value ? 'active' : ''}`}
+                                onClick={() => setStatusFilter(option.value)}
+                            >
+                                {option.label}
+                            </button>
+                        ))}
+                    </div>
+                )}
+
+                {!hasOrders ? (
                     <div className="empty-orders">
                         <div className="empty-icon">📦</div>
                         <h2>Chưa có đơn hàng nào</h2>
@@ -86,9 +117,18 @@ const MyOrders = () => {
                             Mua sắm ngay
                         </button>
                     </div>
+                ) : filteredOrders.length === 0 ? (
+                    <div className="empty-orders">
+                        <div className="empty-icon">📦</div>
+                        <h2>Không có đơn hàng với trạng thái này</h2>
+                        <p>Hãy chọn lại trạng thái khác để xem đơn hàng.</p>
+                        <button onClick={() => setStatusFilter('all')} className="btn btn-primary">
+                            Xem tất cả đơn hàng
+                        </button>
+                    </div>
                 ) : (
                     <div className="orders-list">
-                        {myOrders.map((order) => (
+                        {filteredOrders.map((order) => (
                             <div key={order._id} className="order-card">
                                 <div className="order-header">
                                     <div className="order-info">
