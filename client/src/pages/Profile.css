@@ -1,0 +1,319 @@
+/* Padding tương tự books-section */
+.profile-page {
+    padding-top: 2rem;
+    padding-bottom: 3rem;
+    background-color: #f4f6f9; /* Nền trang xám nhạt */
+}
+
+/* Container phình to hơn giống Dashboard (1200px) */
+.profile-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+/* Layout chia 2 cột */
+.profile-layout {
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
+}
+
+/* Cột Trái: Sidebar Chi Tiết */
+.profile-sidebar {
+    width: 320px; /* To hơn giống mẫu */
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    padding: 0; /* Bo góc tròn ở banner phía trên */
+    flex-shrink: 0;
+    position: sticky;
+    top: 1rem;
+    overflow: hidden; /* Cắt banner đè lên bo góc */
+}
+
+/* Banner ảnh phụ giống image_7.png */
+.profile-avatar-banner {
+    position: relative;
+    padding: 1.5rem 1.5rem 2.5rem 1.5rem;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.avatar-banner-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 80px; /* Chiều cao banner */
+    background-size: cover;
+    background-position: center;
+    border-top-left-radius: 1rem;
+    border-top-right-radius: 1rem;
+}
+
+.avatar-container {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 30px; /* Avatar đè lên banner */
+}
+
+.avatar-container img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 4px solid white; /* Viền trắng nổi bật */
+    object-fit: cover;
+}
+
+.avatar-info h3 {
+    margin: 0;
+    color: #374151;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.avatar-info .avatar-title {
+    margin: 0;
+    color: #6b7280;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+/* Thêm phần Stats giống image_7.png */
+.profile-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+    padding: 1.5rem;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.stat-card {
+    text-align: center;
+    padding: 0.75rem;
+    background-color: #f9fafb;
+    border-radius: 0.5rem;
+    border: 2px solid #e5e7eb;
+}
+
+.stat-card h4 {
+    margin: 0;
+    font-size: 1.15rem;
+    color: #374151;
+    font-weight: 600;
+}
+
+.stat-card p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+/* Các Tab Dọc (👉 SỬ DỤNG VIÊN THUỐC, không phải categories-tab bo góc vuông nhẹ) */
+.profile-tabs-vertical {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1.5rem;
+}
+
+.profile-tab {
+    width: 100%;
+    text-align: left;
+    padding: 0.85rem 1.5rem;
+    border: 2px solid #e5e7eb;
+    background-color: white;
+    border-radius: 9999px; /* VIÊN THUỐC */
+    font-weight: 500;
+    font-size: 1rem;
+    color: #374151;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    box-sizing: border-box;
+    display: block;
+}
+
+.profile-tab:hover {
+    border-color: #6366f1;
+    color: #6366f1;
+    transform: translateX(3px); /* Hiệu ứng hover dọc */
+}
+
+/* Tab Đang Chọn (Kế thừa gradient của nút active trang Home) */
+.profile-tab.active {
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    color: white;
+    border-color: #6366f1;
+    box-shadow: 0 4px 14px 0 rgba(99, 102, 241, 0.3);
+}
+
+/* Cột Phải: Nội Dung (Dạng Card, kế thừa image_7.png) */
+.profile-main-content {
+    flex: 1;
+}
+
+/* Card lớn bọc Form (Design Card giống image_7.png) */
+.content-card {
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    padding: 2.5rem;
+    min-height: 500px;
+}
+
+/* Thẻ Card sub bọc Form phía trên giống image_7.png */
+.content-card-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.content-card-header h2 {
+    margin: 0;
+    color: #374151;
+    font-size: 1.75rem;
+    font-weight: 600;
+}
+
+.content-card-header .subtitle {
+    margin: 0;
+    color: #6b7280;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+/* Form Styles (Sử dụng .custom-input bo góc 0.5rem giống Input Search trang Home) */
+.custom-form .form-group {
+    margin-bottom: 1.5rem;
+}
+
+.custom-form label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #374151;
+}
+
+.custom-input {
+    width: 100%;
+    padding: 0.75rem 1.25rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 0.5rem; /* Bo góc Input */
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background-color: white;
+    box-sizing: border-box;
+}
+
+/* Focus Input (Giống hệt .search-input:focus trang Home) */
+.custom-input:focus {
+    outline: none;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.custom-input:disabled {
+    background-color: #f3f4f6;
+    color: #9ca3af;
+    cursor: not-allowed;
+}
+
+/* 👉 Nút Submit chính (Dùng gradient và bo góc TRÒN VIÊN THUỐC) */
+.btn-gradient {
+    width: 100%;
+    padding: 1rem;
+    border: none;
+    border-radius: 9999px; /* VIÊN THUỐC */
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 1rem;
+}
+
+.btn-gradient:hover {
+    box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.4);
+    transform: translateY(-2px);
+}
+
+/* Thẻ Card Địa Chỉ (Giống Input bo góc 0.5rem) */
+.address-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 0.5rem; /* Bo góc */
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.address-card:hover {
+    border-color: #6366f1;
+}
+
+.address-info p {
+    margin: 0.25rem 0;
+    color: #4b5563;
+}
+
+/* 👉 Tag Mặc định là bo góc tròn */
+.badge-gradient {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%); /* Màu xanh lá */
+    color: white;
+    padding: 0.35rem 1rem;
+    border-radius: 9999px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+/* Nút Viền bo góc tròn (Cho thêm mới địa chỉ) */
+.btn-outline-gradient {
+    width: 100%;
+    padding: 1rem;
+    border: 2px dashed #a5b4fc;
+    border-radius: 0.5rem;
+    background-color: transparent;
+    color: #4f46e5;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-gradient:hover {
+    border-color: #4f46e5;
+    background-color: #eef2ff;
+}
+
+/* Animations */
+.fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .profile-layout {
+        flex-direction: column;
+    }
+    .profile-sidebar {
+        width: 100%;
+        position: relative;
+        top: 0;
+    }
+    .avatar-banner-bg {
+        border-radius: 1rem;
+    }
+}

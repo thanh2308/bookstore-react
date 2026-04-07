@@ -142,7 +142,6 @@ const Register = () => {
 
                         <div className="form-group">
                             <label htmlFor="confirmPassword">Xác nhận mật khẩu</label>
-                            {/* Bọc input bằng div relative */}
                             <div style={{ position: 'relative' }}>
                                 <input
                                     type={showConfirmPassword ? "text" : "password"} 
@@ -152,7 +151,7 @@ const Register = () => {
                                     onChange={handleChange}
                                     required
                                     placeholder="••••••••"
-                                    minLength="6"
+                                    minLength="6" 
                                     disabled={loading}
                                     style={{ width: '100%', paddingRight: '40px' }}
                                 />
@@ -166,14 +165,14 @@ const Register = () => {
                             </div>
                         </div>
 
-                        <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '15px' }}>
+                        <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '15px', width: '100%' }}>
                             <input 
                                 type="checkbox" 
                                 id="terms" 
                                 checked={agreeTerms}
                                 onChange={(e) => setAgreeTerms(e.target.checked)}
                                 disabled={loading}
-                                style={{ cursor: 'pointer' }}
+                                style={{ cursor: 'pointer', width: 'auto', flexShrink: 0 }}
                             />
                             <label htmlFor="terms" style={{ margin: 0, cursor: 'pointer', fontSize: '14px' }}>
                                 Tôi đồng ý với <Link to="/terms" style={{ color: '#007bff' }}>Điều khoản dịch vụ</Link>

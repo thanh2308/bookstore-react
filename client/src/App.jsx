@@ -15,6 +15,7 @@ import Checkout from './pages/Checkout';
 import Wishlist from './pages/Wishlist';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import Profile from './pages/Profile';
 import MyOrders from './pages/MyOrders';
 import OrderSuccess from './pages/OrderSuccess';
 import OrderDetail from './pages/OrderDetail';
@@ -46,6 +47,7 @@ function App() {
                                 <Route path="/checkout" element={<Checkout />} />
                                 <Route path="/login" element={<Login />} />
                                 <Route path="/register" element={<Register />} />
+                                <Route path="/profile" element={<Profile />} />
 
                                 {/* User Order Routes */}
                                 <Route path="/my-orders" element={<ProtectedRoute><MyOrders /></ProtectedRoute>} />
