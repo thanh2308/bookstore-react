@@ -1,34 +1,50 @@
-import React, { useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { fetchBooks } from '../../redux/booksSlice';
 import { fetchAllOrders } from '../../redux/ordersSlice';
+import analyticsService from '../../services/analyticsService';
 import './Dashboard.css';
 
 const Dashboard = () => {
     const dispatch = useDispatch();
     const allBooks = useSelector(state => state.books.allBooks);
-    const { allOrders, loading } = useSelector(state => state.orders);
+    const allOrders = useSelector(state => state.orders.allOrders);
+    const [summary, setSummary] = useState(null);
+    const [revenueData, setRevenueData] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        dispatch(fetchAllOrders());
+        const loadDashboard = async () => {
+            setLoading(true);
+            try {
+                if (allBooks.length === 0) {
+                    dispatch(fetchBooks({ page: 1, limit: 100 }));
+                }
+                if (allOrders.length === 0) {
+                    dispatch(fetchAllOrders({ page: 1, limit: 100 }));
+                }
+
+                const [summaryResult, revenueResult] = await Promise.all([
+                    analyticsService.getSummary(),
+                    analyticsService.getRevenue('month')
+                ]);
+
+                setSummary(summaryResult.summary);
+                setRevenueData(revenueResult.data || []);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadDashboard();
     }, [dispatch]);
 
-    // Calculate real statistics from orders
-    const totalOrders = allOrders.length;
-    const pendingOrders = allOrders.filter(o => o.status === 'pending').length;
-    const totalRevenue = allOrders
-        .filter(o => o.status !== 'cancelled')
-        .reduce((sum, o) => sum + (o.totalPrice || 0), 0);
-
-    // recent orders sorted by date
-    const recentOrders = [...allOrders]
-        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-        .slice(0, 5);
-
     const stats = [
-        { icon: '📚', label: 'Tổng Sách', value: allBooks.length, color: '#6366f1' },
-        { icon: '📦', label: 'Đơn Hàng', value: totalOrders, color: '#10b981' },
-        { icon: '💰', label: 'Doanh Thu', value: `${(totalRevenue / 1000000).toFixed(1)}M`, color: '#f59e0b' },
-        { icon: '⏳', label: 'Chờ Xử Lý', value: pendingOrders, color: '#ec4899' },
+        { icon: '📚', label: 'Tổng Sách', value: summary?.totalBooks ?? allBooks.length, color: '#6366f1' },
+        { icon: '👥', label: 'Tổng User', value: summary?.totalUsers ?? 0, color: '#0ea5e9' },
+        { icon: '📦', label: 'Đơn Hàng', value: summary?.totalOrders ?? allOrders.length, color: '#10b981' },
+        { icon: '💰', label: 'Doanh Thu', value: `${((summary?.totalRevenue || 0) / 1000000).toFixed(1)}M`, color: '#f59e0b' },
     ];
 
     if (loading) {
@@ -49,7 +65,7 @@ const Dashboard = () => {
             <div className="stats-grid">
                 {stats.map((stat, index) => (
                     <div key={index} className="stat-card" style={{ borderLeftColor: stat.color }}>
-                        <div className="stat-icon" style={{ backgroundColor: stat.color + '20' }}>
+                        <div className="stat-icon" style={{ backgroundColor: `${stat.color}20` }}>
                             {stat.icon}
                         </div>
                         <div className="stat-info">
@@ -60,18 +76,31 @@ const Dashboard = () => {
                 ))}
             </div>
 
+            <div className="dashboard-card" style={{ marginBottom: '1.5rem' }}>
+                <h3>📈 Doanh Thu Theo Tháng</h3>
+                <ResponsiveContainer width="100%" height={280}>
+                    <LineChart data={revenueData}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="label" />
+                        <YAxis />
+                        <Tooltip formatter={(value) => `${Number(value).toLocaleString()}₫`} />
+                        <Line type="monotone" dataKey="revenue" stroke="#6366f1" strokeWidth={3} />
+                    </LineChart>
+                </ResponsiveContainer>
+            </div>
+
             <div className="dashboard-grid">
                 <div className="dashboard-card">
                     <h3>📦 Đơn Hàng Gần Đây</h3>
                     <div className="activity-list">
-                        {recentOrders.length > 0 ? (
-                            recentOrders.map((order) => (
+                        {(summary?.recentOrders || []).length > 0 ? (
+                            summary.recentOrders.map((order) => (
                                 <div key={order._id} className="activity-item">
                                     <span className="activity-icon">🛒</span>
                                     <div className="activity-content">
                                         <p>Đơn hàng #{order.orderNumber}</p>
                                         <span className="activity-time">
-                                            {order.shippingAddress?.fullName} - {order.totalPrice.toLocaleString()}₫
+                                            {order.customer?.name || order.shippingAddress?.fullName || 'Khách'} - {Number(order.totalPrice || 0).toLocaleString()}₫
                                         </span>
                                     </div>
                                     <span className={`status-badge status-${order.status}`}>
@@ -88,14 +117,14 @@ const Dashboard = () => {
                 <div className="dashboard-card">
                     <h3>🔥 Sách Bán Chạy</h3>
                     <div className="top-books-list">
-                        {allBooks.slice(0, 5).map((book) => (
+                        {(summary?.topBooks || allBooks.slice(0, 5)).slice(0, 5).map((book) => (
                             <div key={book._id || book.id} className="top-book-item">
                                 <img src={book.image} alt={book.title} />
                                 <div className="top-book-info">
                                     <p className="top-book-title">{book.title}</p>
                                     <span className="top-book-author">{book.author}</span>
                                 </div>
-                                <span className="top-book-price">{book.price.toLocaleString()}₫</span>
+                                <span className="top-book-price">{Number(book.price || 0).toLocaleString()}₫</span>
                             </div>
                         ))}
                     </div>

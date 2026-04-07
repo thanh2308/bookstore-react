@@ -18,6 +18,7 @@ const BookFormModal = ({ book, onSave, onClose }) => {
         stockQuantity: 0,
         inStock: true
     });
+    const [imageFile, setImageFile] = useState(null);
     const [imagePreview, setImagePreview] = useState(book?.image || '');
 
     const handleImageUpload = (e) => {
@@ -29,22 +30,24 @@ const BookFormModal = ({ book, onSave, onClose }) => {
                 return;
             }
 
-            // Convert to base64
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                const base64String = reader.result;
-                setFormData({ ...formData, image: base64String });
-                setImagePreview(base64String);
-            };
-            reader.readAsDataURL(file);
+            // Keep File object for upload, and create preview
+            setImageFile(file);
+            const previewUrl = URL.createObjectURL(file);
+            setImagePreview(previewUrl);
+            // Don't set image property yet, keep it for backend
         }
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        if (!formData.title || !formData.author || !formData.price) {
-            showError('Vui lòng điền đầy đủ thông tin bắt buộc');
+        if (!formData.title || !formData.author || !formData.price || !formData.isbn || !formData.description) {
+            showError('Vui lòng điền đầy đủ tất cả thông tin bắt buộc (*)');
+            return;
+        }
+
+        if (!imageFile && !book && !formData.image) {
+            showError('Vui lòng chọn ảnh sách');
             return;
         }
 
@@ -55,6 +58,11 @@ const BookFormModal = ({ book, onSave, onClose }) => {
             rating: parseFloat(formData.rating),
             stockQuantity: parseInt(formData.stockQuantity) || 0
         };
+
+        // Gắn File object nếu có chọn ảnh mới
+        if (imageFile) {
+            bookData.image = imageFile;
+        }
 
         onSave(bookData);
     };
@@ -148,6 +156,43 @@ const BookFormModal = ({ book, onSave, onClose }) => {
                         </div>
                     </div>
 
+                    <div className="form-row">
+                        <div className="form-group">
+                            <label>ISBN *</label>
+                            <input
+                                type="text"
+                                value={formData.isbn}
+                                onChange={(e) => setFormData({ ...formData, isbn: e.target.value })}
+                                required
+                                className="input"
+                                placeholder="978-604-2-12345-6"
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label>Số lượng tồn kho</label>
+                            <input
+                                type="number"
+                                min="0"
+                                value={formData.stockQuantity}
+                                onChange={(e) => setFormData({ ...formData, stockQuantity: e.target.value })}
+                                className="input"
+                                placeholder="0"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="form-group">
+                        <label>Mô tả *</label>
+                        <textarea
+                            value={formData.description}
+                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                            className="input"
+                            rows="3"
+                            required
+                        />
+                    </div>
+
                     <div className="form-group">
                         <label>Hình ảnh sách *</label>
 
@@ -168,10 +213,12 @@ const BookFormModal = ({ book, onSave, onClose }) => {
 
                                 <input
                                     type="url"
-                                    value={formData.image.startsWith('data:') ? '' : formData.image}
+                                    value={typeof formData.image === 'string' && !formData.image.startsWith('data:') ? formData.image : ''}
                                     onChange={(e) => {
-                                        setFormData({ ...formData, image: e.target.value });
-                                        setImagePreview(e.target.value);
+                                        const url = e.target.value;
+                                        setFormData({ ...formData, image: url });
+                                        setImagePreview(url);
+                                        setImageFile(null);
                                     }}
                                     className="input"
                                     placeholder="Nhập URL hình ảnh"
@@ -186,6 +233,7 @@ const BookFormModal = ({ book, onSave, onClose }) => {
                                         onClick={() => {
                                             setFormData({ ...formData, image: '' });
                                             setImagePreview('');
+                                            setImageFile(null);
                                         }}
                                         className="btn-remove-image"
                                     >
@@ -194,16 +242,6 @@ const BookFormModal = ({ book, onSave, onClose }) => {
                                 </div>
                             )}
                         </div>
-                    </div>
-
-                    <div className="form-group">
-                        <label>Mô tả</label>
-                        <textarea
-                            value={formData.description}
-                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                            className="input"
-                            rows="3"
-                        />
                     </div>
 
                     <div className="form-actions">

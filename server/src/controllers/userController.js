@@ -136,6 +136,48 @@ export const deleteUser = async (req, res) => {
     }
 };
 
+// @desc    Toggle user block status
+// @route   PUT /api/users/:id/block
+// @access  Private/Admin
+export const toggleUserBlock = async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id);
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'Không tìm thấy người dùng'
+            });
+        }
+
+        if (user.role === 'admin') {
+            return res.status(400).json({
+                success: false,
+                message: 'Không thể khóa tài khoản admin'
+            });
+        }
+
+        user.isBlocked = !user.isBlocked;
+        await user.save();
+
+        res.status(200).json({
+            success: true,
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                isBlocked: user.isBlocked
+            }
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
 // @desc    Add address
 // @route   POST /api/users/address
 // @access  Private

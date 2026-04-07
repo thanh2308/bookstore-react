@@ -37,6 +37,11 @@ export const userService = {
         return response.data;
     },
 
+    toggleUserBlock: async (id) => {
+        const response = await api.put(`/users/${id}/block`);
+        return response.data;
+    },
+
     // Address management
     addAddress: async (addressData) => {
         const response = await api.post('/users/address', addressData);

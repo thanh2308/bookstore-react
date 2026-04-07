@@ -42,9 +42,17 @@ export const bookService = {
         const formData = new FormData();
 
         Object.keys(bookData).forEach(key => {
-            if (key === 'image' && bookData[key] instanceof File) {
-                formData.append('image', bookData[key]);
-            } else {
+            if (key === 'image') {
+                // If image is a File object, append it for multipart upload
+                if (bookData[key] instanceof File) {
+                    formData.append('image', bookData[key]);
+                }
+                // If image is a URL string, append it as regular data
+                else if (typeof bookData[key] === 'string' && bookData[key]) {
+                    formData.append('image', bookData[key]);
+                }
+                // If image is empty, don't append (will use default or existing)
+            } else if (bookData[key] !== undefined && bookData[key] !== '') {
                 formData.append(key, bookData[key]);
             }
         });
@@ -62,9 +70,17 @@ export const bookService = {
         const formData = new FormData();
 
         Object.keys(bookData).forEach(key => {
-            if (key === 'image' && bookData[key] instanceof File) {
-                formData.append('image', bookData[key]);
-            } else {
+            if (key === 'image') {
+                // If image is a File object, append it for multipart upload
+                if (bookData[key] instanceof File) {
+                    formData.append('image', bookData[key]);
+                }
+                // If image is a URL string, append it as regular data
+                else if (typeof bookData[key] === 'string' && bookData[key]) {
+                    formData.append('image', bookData[key]);
+                }
+                // If image is empty, don't append (will keep existing)
+            } else if (bookData[key] !== undefined && bookData[key] !== '') {
                 formData.append(key, bookData[key]);
             }
         });
