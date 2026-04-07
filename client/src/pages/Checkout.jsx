@@ -27,6 +27,47 @@ const Checkout = () => {
     const [paymentMethod, setPaymentMethod] = useState('COD');
     const [submitted, setSubmitted] = useState(false);
 
+    const [voucher, setVoucher] = useState('');
+    const [discount, setDiscount] = useState(0);
+    const [isVoucherApplied, setIsVoucherApplied] = useState(false);
+
+    const applyVoucher = () => {
+        let discountValue = 0;
+
+        if (voucher === 'SALE10') {
+            discountValue = totalPrice * 0.1;
+        } else if (voucher === 'SALE20') {
+            discountValue = totalPrice * 0.2;
+        } else if (voucher === 'FREESHIP') {
+            discountValue = 0;
+        } else {
+            showToastError('Mã không hợp lệ');
+            return;
+        }
+
+        setDiscount(discountValue);
+
+        localStorage.setItem(
+            'voucher',
+            JSON.stringify({
+                code: voucher,
+                discount: discountValue
+            })
+        );
+
+        success(`Áp dụng mã ${voucher} thành công!`);
+    };
+
+    useEffect(() => {
+        const saved = localStorage.getItem('voucher');
+        if (saved) {
+            const data = JSON.parse(saved);
+            setVoucher(data.code);
+            setDiscount(data.discount);
+            setIsVoucherApplied(true);
+        }
+    }, []);
+
     // Redirect if not authenticated
     useEffect(() => {
         if (!isAuthenticated) {
@@ -60,8 +101,24 @@ const Checkout = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Create order object matching backend schema
+        // Kiểm tra tồn kho...
+        for (let item of cart) {
+            const stock = item.stockQuantity ?? item.countInStock ?? 0;
+            if (stock === 0) {
+                showToastError(`"${item.title}" đã hết hàng`);
+                return;
+            }
+            if (item.quantity > stock) {
+                showToastError(`"${item.title}" chỉ còn ${stock} sản phẩm`);
+                return;
+            }
+        }
+
+        // Tính tổng cuối cùng trước khi tạo orderData
+        const finalTotal = totalPrice - discount;
+
         const orderData = {
+            orderNumber: `ORD-${Date.now()}`,
             customer: {
                 name: shippingInfo.fullName,
                 email: shippingInfo.email,
@@ -81,24 +138,16 @@ const Checkout = () => {
             paymentMethod: paymentMethod,
             itemsPrice: totalPrice,
             shippingPrice: 0,
-            totalPrice: totalPrice,
+            totalPrice: finalTotal,
             notes: shippingInfo.notes || ''
         };
 
         try {
-            // Dispatch create order action
             const result = await dispatch(createOrder(orderData)).unwrap();
-
-            // Clear cart on success
             dispatch(clearCart());
             setSubmitted(true);
-
             success('Đặt hàng thành công!');
-
-            // Navigate to success page after delay
-            setTimeout(() => {
-                navigate('/orders');
-            }, 2000);
+            setTimeout(() => navigate('/my-orders'), 2000);
         } catch (err) {
             console.error('Order creation failed:', err);
             showToastError(err.message || 'Đặt hàng thất bại. Vui lòng thử lại!');
@@ -135,6 +184,8 @@ const Checkout = () => {
     if (cart.length === 0) {
         return null;
     }
+
+    const finalTotal = totalPrice - discount;
 
     return (
         <div className="checkout-page">
@@ -260,6 +311,50 @@ const Checkout = () => {
                                 />
                             </div>
 
+                            {/* Voucher */}
+                            <div className="voucher">
+                                <label>Chọn mã giảm giá</label>
+
+                                <select
+                                    value={voucher}
+                                    onChange={(e) => {
+                                        const newVoucher = e.target.value;
+                                        setVoucher(newVoucher);
+
+                                        let discountValue = 0;
+
+                                        if (newVoucher === 'SALE10') {
+                                            discountValue = totalPrice * 0.1;
+                                        } else if (newVoucher === 'SALE20') {
+                                            discountValue = totalPrice * 0.2;
+                                        } else if (newVoucher === 'FREESHIP') {
+                                            discountValue = 0;
+                                        }
+
+                                        setDiscount(discountValue);
+
+                                        // lưu localStorage luôn
+                                        localStorage.setItem(
+                                            'voucher',
+                                            JSON.stringify({
+                                                code: newVoucher,
+                                                discount: discountValue
+                                            })
+                                        );
+                                    }}
+                                >
+                                    <option value=""> Chọn voucher </option>
+                                    <option value="SALE10">SALE10 - Giảm 10%</option>
+                                    <option value="SALE20">SALE20 - Giảm 20%</option>
+                                </select>
+
+                                {voucher && (
+                                    <p className="voucher-applied">
+                                        Đã áp dụng: <strong>{voucher}</strong>
+                                    </p>
+                                )}
+                            </div>
+
                             <button
                                 type="submit"
                                 className="btn btn-primary submit-btn"
@@ -292,14 +387,24 @@ const Checkout = () => {
                                 <span>Tạm tính:</span>
                                 <span>{totalPrice.toLocaleString('vi-VN')}₫</span>
                             </div>
+
                             <div className="order-row">
                                 <span>Phí vận chuyển:</span>
                                 <span className="free-text">Miễn phí</span>
                             </div>
+
+                            {discount > 0 && (
+                                <div className="order-row discount">
+                                    <span>Giảm giá:</span>
+                                    <span>-{discount.toLocaleString('vi-VN')}₫</span>
+                                </div>
+                            )}
+
                             <div className="order-divider"></div>
+
                             <div className="order-row total">
                                 <span>Tổng cộng:</span>
-                                <span className="total-price">{totalPrice.toLocaleString('vi-VN')}₫</span>
+                                <span className="total-price">{finalTotal.toLocaleString('vi-VN')}₫</span>
                             </div>
                         </div>
                     </div>

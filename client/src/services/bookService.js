@@ -85,8 +85,13 @@ export const bookService = {
 
     // Add review
     addReview: async (id, reviewData) => {
-        const response = await api.post(`/books/${id}/reviews`, reviewData);
-        return response.data;
+        try {
+            const response = await api.post(`/books/${id}/reviews`, reviewData);
+            return response.data;
+        } catch (error) {
+            console.log('Review API error:', error.response?.data);
+            throw error;
+        }
     },
 
     // Update stock (Admin)

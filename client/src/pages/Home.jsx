@@ -1,7 +1,14 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { setSearchQuery, setCategory, setSortBy, fetchBooks } from '../redux/booksSlice';
+import {
+    setSearchQuery,
+    setCategory,
+    setSortBy,
+    setPage,
+    fetchBooks
+} from '../redux/booksSlice';
 import BookCard from '../components/BookCard';
+import Pagination from '../components/Pagination';
 import './Home.css';
 
 const categories = ['Tất cả', 'Kỹ năng sống', 'Tiểu thuyết', 'Khoa học', 'Kinh tế', 'Văn học Việt Nam', 'Thiếu nhi'];
@@ -14,20 +21,24 @@ const Home = () => {
         selectedCategory,
         sortBy,
         loading,
-        error
+        error,
+        currentPage,
+        totalPages,
+        total
     } = useSelector(state => state.books);
 
+    const [searchInput, setSearchInput] = useState(searchQuery);
     // Fetch books on mount and when filters change
     useEffect(() => {
         const filters = {
             category: selectedCategory,
             search: searchQuery,
             sortBy: sortBy,
-            page: 1,
+            page: currentPage,
             limit: 20
         };
         dispatch(fetchBooks(filters));
-    }, [dispatch, selectedCategory, searchQuery, sortBy]);
+    }, [dispatch, selectedCategory, searchQuery, sortBy, currentPage]);
 
     const handleSearch = (value) => {
         dispatch(setSearchQuery(value));
@@ -37,9 +48,17 @@ const Home = () => {
         dispatch(setCategory(category));
     };
 
-    const handleSortChange = (sort) => {
-        dispatch(setSortBy(sort));
+    const handlePageChange = (page) => {
+        dispatch(setPage(page));
     };
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            dispatch(setSearchQuery(searchInput));
+        }, 500);
+
+        return () => clearTimeout(timer);
+    }, [searchInput, dispatch]);
 
     return (
         <div className="home-page">
@@ -54,8 +73,8 @@ const Home = () => {
                             <input
                                 type="text"
                                 placeholder="Tìm kiếm sách theo tên hoặc tác giả..."
-                                value={searchQuery}
-                                onChange={(e) => handleSearch(e.target.value)}
+                                value={searchInput}
+                                onChange={(e) => setSearchInput(e.target.value)}
                                 className="search-input"
                             />
                             <span className="search-icon">🔍</span>
@@ -125,6 +144,17 @@ const Home = () => {
                         <div className="no-books">
                             <p>📚 Không tìm thấy sách nào</p>
                         </div>
+                    )}
+
+                    {/* Pagination */}
+                    {totalPages > 1 && (
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={handlePageChange}
+                            totalItems={total}
+                            itemsPerPage={20}
+                        />
                     )}
                 </div>
             </section>

@@ -3,7 +3,7 @@ import orderService from '../services/orderService';
 
 const initialState = {
     myOrders: [],
-    allOrders: [], // For admin
+    allOrders: [], // Admin
     currentOrder: null,
     loading: false,
     error: null
@@ -15,7 +15,7 @@ export const createOrder = createAsyncThunk(
     async (orderData, { rejectWithValue }) => {
         try {
             const data = await orderService.createOrder(orderData);
-            return data;
+            return data; // backend trả về object order trực tiếp
         } catch (error) {
             return rejectWithValue(error.message);
         }
@@ -27,7 +27,7 @@ export const fetchMyOrders = createAsyncThunk(
     async (_, { rejectWithValue }) => {
         try {
             const data = await orderService.getMyOrders();
-            return data;
+            return data; // backend trả về mảng orders trực tiếp
         } catch (error) {
             return rejectWithValue(error.message);
         }
@@ -39,7 +39,7 @@ export const fetchOrderById = createAsyncThunk(
     async (id, { rejectWithValue }) => {
         try {
             const data = await orderService.getOrderById(id);
-            return data;
+            return data; // backend trả về object order trực tiếp
         } catch (error) {
             return rejectWithValue(error.message);
         }
@@ -51,7 +51,7 @@ export const cancelOrder = createAsyncThunk(
     async ({ id, reason }, { rejectWithValue }) => {
         try {
             const data = await orderService.cancelOrder(id, reason);
-            return data;
+            return data; // backend trả về object order trực tiếp
         } catch (error) {
             return rejectWithValue(error.message);
         }
@@ -63,7 +63,7 @@ export const fetchAllOrders = createAsyncThunk(
     async (filters, { rejectWithValue }) => {
         try {
             const data = await orderService.getAllOrders(filters);
-            return data;
+            return data; // backend trả về mảng orders trực tiếp
         } catch (error) {
             return rejectWithValue(error.message);
         }
@@ -75,7 +75,7 @@ export const updateOrderStatus = createAsyncThunk(
     async ({ id, status, note }, { rejectWithValue }) => {
         try {
             const data = await orderService.updateOrderStatus(id, status, note);
-            return data;
+            return data; // backend trả về object order trực tiếp
         } catch (error) {
             return rejectWithValue(error.message);
         }
@@ -102,8 +102,8 @@ const ordersSlice = createSlice({
             })
             .addCase(createOrder.fulfilled, (state, action) => {
                 state.loading = false;
-                state.currentOrder = action.payload.order;
-                state.myOrders.unshift(action.payload.order);
+                state.currentOrder = action.payload;
+                state.myOrders.unshift(action.payload);
             })
             .addCase(createOrder.rejected, (state, action) => {
                 state.loading = false;
@@ -116,7 +116,7 @@ const ordersSlice = createSlice({
             })
             .addCase(fetchMyOrders.fulfilled, (state, action) => {
                 state.loading = false;
-                state.myOrders = action.payload.orders;
+                state.myOrders = action.payload;
             })
             .addCase(fetchMyOrders.rejected, (state, action) => {
                 state.loading = false;
@@ -129,7 +129,7 @@ const ordersSlice = createSlice({
             })
             .addCase(fetchOrderById.fulfilled, (state, action) => {
                 state.loading = false;
-                state.currentOrder = action.payload.order;
+                state.currentOrder = action.payload;
             })
             .addCase(fetchOrderById.rejected, (state, action) => {
                 state.loading = false;
@@ -142,13 +142,14 @@ const ordersSlice = createSlice({
             })
             .addCase(cancelOrder.fulfilled, (state, action) => {
                 state.loading = false;
-                if (state.currentOrder && state.currentOrder._id === action.payload.order._id) {
-                    state.currentOrder = action.payload.order;
+                // Cập nhật currentOrder nếu đang mở
+                if (state.currentOrder && state.currentOrder._id === action.payload._id) {
+                    state.currentOrder = action.payload;
                 }
-                // Update in myOrders list
-                const index = state.myOrders.findIndex(o => o._id === action.payload.order._id);
+                // Cập nhật trong myOrders
+                const index = state.myOrders.findIndex(o => o._id === action.payload._id);
                 if (index >= 0) {
-                    state.myOrders[index] = action.payload.order;
+                    state.myOrders[index] = action.payload;
                 }
             })
             .addCase(cancelOrder.rejected, (state, action) => {
@@ -162,7 +163,7 @@ const ordersSlice = createSlice({
             })
             .addCase(fetchAllOrders.fulfilled, (state, action) => {
                 state.loading = false;
-                state.allOrders = action.payload.orders;
+                state.allOrders = action.payload;
             })
             .addCase(fetchAllOrders.rejected, (state, action) => {
                 state.loading = false;
@@ -175,9 +176,9 @@ const ordersSlice = createSlice({
             })
             .addCase(updateOrderStatus.fulfilled, (state, action) => {
                 state.loading = false;
-                const index = state.allOrders.findIndex(o => o._id === action.payload.order._id);
+                const index = state.allOrders.findIndex(o => o._id === action.payload._id);
                 if (index >= 0) {
-                    state.allOrders[index] = action.payload.order;
+                    state.allOrders[index] = action.payload;
                 }
             })
             .addCase(updateOrderStatus.rejected, (state, action) => {

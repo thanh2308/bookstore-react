@@ -7,7 +7,7 @@ import { sendOrderConfirmation, sendOrderStatusUpdate } from '../services/emailS
 // @access  Private
 export const createOrder = async (req, res) => {
     try {
-        const { items, shippingAddress, paymentMethod, notes, customer, promotionCode } = req.body;
+        const { items, shippingAddress, paymentMethod, notes, customer, promotionCode, orderNumber, totalPrice: finalTotal, itemsPrice: requestItemsPrice } = req.body;
 
         if (!items || items.length === 0) {
             return res.status(400).json({
@@ -71,6 +71,7 @@ export const createOrder = async (req, res) => {
         const totalPrice = itemsPrice - discount;
 
         const order = await Order.create({
+            orderNumber,
             user: req.user._id,
             customer: customer || {
                 name: req.user.name,
@@ -80,9 +81,9 @@ export const createOrder = async (req, res) => {
             items: orderItems,
             shippingAddress,
             paymentMethod: paymentMethod || 'COD',
-            itemsPrice,
+            itemsPrice: requestItemsPrice || itemsPrice,
             shippingPrice: 0,
-            totalPrice,
+            totalPrice: finalTotal || itemsPrice,
             discount,
             promotionCode: finalPromotionCode,
             notes

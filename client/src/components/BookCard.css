@@ -145,7 +145,7 @@
     transform: translateY(100%);
 }
 
-.book-image-wrapper:hover .preview-btn {
+.book-card:hover .preview-btn {
     opacity: 1;
     transform: translateY(0);
 }
