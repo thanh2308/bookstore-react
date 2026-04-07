@@ -37,6 +37,10 @@ const userSchema = new mongoose.Schema({
         enum: ['user', 'admin'],
         default: 'user'
     },
+    isBlocked: {
+        type: Boolean,
+        default: false
+    },
     addresses: [addressSchema],
     orderHistory: [{
         type: mongoose.Schema.Types.ObjectId,

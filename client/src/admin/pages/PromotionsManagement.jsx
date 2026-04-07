@@ -1,66 +1,139 @@
-import React, { useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { addPromotion, updatePromotion, deletePromotion, togglePromotionActive } from '../../redux/promotionsSlice';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useToast } from '../../components/Toast';
+import promotionService from '../../services/promotionService';
 import './PromotionsManagement.css';
 
 const PromotionsManagement = () => {
-    const dispatch = useDispatch();
-    const { success } = useToast();
-    const promotions = useSelector(state => state.promotions.promotions);
-    const allBooks = useSelector(state => state.books.allBooks);
+    const { success, error: showError } = useToast();
+    const [promotions, setPromotions] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const [editingPromotion, setEditingPromotion] = useState(null);
 
     const categories = ['Kỹ năng sống', 'Tiểu thuyết', 'Khoa học', 'Kinh tế', 'Thiếu nhi', 'Văn học Việt Nam'];
 
-    const [formData, setFormData] = useState({
-        name: '',
+    const emptyForm = {
+        code: '',
+        description: '',
+        discountType: 'percentage',
+        discountValue: 10,
+        minOrderValue: 0,
+        maxDiscount: '',
         startDate: '',
         endDate: '',
-        discountRate: 0,
-        categories: []
-    });
-
-    const handleEdit = (promotion) => {
-        setEditingPromotion(promotion);
-        setFormData(promotion);
-        setShowModal(true);
+        usageLimit: '',
+        applicableCategories: []
     };
+
+    const [formData, setFormData] = useState(emptyForm);
+
+    useEffect(() => {
+        const loadPromotions = async () => {
+            setLoading(true);
+            try {
+                const data = await promotionService.getPromotions(false);
+                setPromotions(data.promotions || []);
+            } catch (error) {
+                showError(error.message || 'Không tải được khuyến mãi');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadPromotions();
+    }, [showError]);
 
     const handleAddNew = () => {
         setEditingPromotion(null);
-        setFormData({ name: '', startDate: '', endDate: '', discountRate: 0, categories: [] });
+        setFormData(emptyForm);
         setShowModal(true);
     };
 
-    const handleSubmit = (e) => {
+    const handleEdit = (promotion) => {
+        setEditingPromotion(promotion);
+        setFormData({
+            code: promotion.code || '',
+            description: promotion.description || '',
+            discountType: promotion.discountType || 'percentage',
+            discountValue: promotion.discountValue || 10,
+            minOrderValue: promotion.minOrderValue || 0,
+            maxDiscount: promotion.maxDiscount ?? '',
+            startDate: promotion.startDate ? String(promotion.startDate).slice(0, 10) : '',
+            endDate: promotion.endDate ? String(promotion.endDate).slice(0, 10) : '',
+            usageLimit: promotion.usageLimit ?? '',
+            applicableCategories: promotion.applicableCategories || []
+        });
+        setShowModal(true);
+    };
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        if (editingPromotion) {
-            dispatch(updatePromotion({ ...formData, id: editingPromotion.id }));
-            success('Đã cập nhật khuyến mãi!');
-        } else {
-            dispatch(addPromotion(formData));
-            success('Đã tạo khuyến mãi mới!');
+
+        const payload = {
+            code: formData.code.toUpperCase(),
+            description: formData.description,
+            discountType: formData.discountType,
+            discountValue: Number(formData.discountValue),
+            minOrderValue: Number(formData.minOrderValue),
+            maxDiscount: formData.maxDiscount === '' ? undefined : Number(formData.maxDiscount),
+            startDate: new Date(formData.startDate),
+            endDate: new Date(formData.endDate),
+            usageLimit: formData.usageLimit === '' ? undefined : Number(formData.usageLimit),
+            applicableCategories: formData.applicableCategories
+        };
+
+        try {
+            if (editingPromotion) {
+                const data = await promotionService.updatePromotion(editingPromotion._id, payload);
+                setPromotions(prev => prev.map(item => item._id === editingPromotion._id ? data.promotion : item));
+                success('Đã cập nhật khuyến mãi!');
+            } else {
+                const data = await promotionService.createPromotion(payload);
+                setPromotions(prev => [data.promotion, ...prev]);
+                success('Đã tạo khuyến mãi mới!');
+            }
+            setShowModal(false);
+        } catch (error) {
+            showError(error.message || 'Không lưu được khuyến mãi');
         }
-        setShowModal(false);
     };
 
-    const handleDelete = (id, name) => {
-        if (window.confirm(`Xóa khuyến mãi "${name}"?`)) {
-            dispatch(deletePromotion(id));
+    const handleDelete = async (id, code) => {
+        if (!window.confirm(`Xóa khuyến mãi "${code}"?`)) {
+            return;
+        }
+
+        try {
+            await promotionService.deletePromotion(id);
+            setPromotions(prev => prev.filter(item => item._id !== id));
             success('Đã xóa khuyến mãi!');
+        } catch (error) {
+            showError(error.message || 'Không xóa được khuyến mãi');
         }
     };
 
-    const handleToggle = (id) => {
-        dispatch(togglePromotionActive(id));
-        success('Đã cập nhật trạng thái!');
+    const handleToggle = async (promotion) => {
+        try {
+            const data = await promotionService.updatePromotion(promotion._id, {
+                isActive: !promotion.isActive
+            });
+            setPromotions(prev => prev.map(item => item._id === promotion._id ? data.promotion : item));
+            success('Đã cập nhật trạng thái!');
+        } catch (error) {
+            showError(error.message || 'Không cập nhật được trạng thái');
+        }
     };
 
-    const getAffectedBooks = (promotion) => {
-        return allBooks.filter(book => promotion.categories.includes(book.category)).length;
-    };
+    const promoCount = useMemo(() => promotions.length, [promotions]);
+
+    if (loading) {
+        return (
+            <div className="loading-state">
+                <div className="spinner"></div>
+                <p>Đang tải khuyến mãi...</p>
+            </div>
+        );
+    }
 
     return (
         <div className="promotions-management">
@@ -71,13 +144,15 @@ const PromotionsManagement = () => {
                 </button>
             </div>
 
+            <p style={{ marginBottom: '1rem' }}>Tổng khuyến mãi: {promoCount}</p>
+
             <div className="promotions-grid">
                 {promotions.map((promo) => (
-                    <div key={promo.id} className={`promo-card ${promo.isActive ? 'active' : 'inactive'}`}>
+                    <div key={promo._id} className={`promo-card ${promo.isActive ? 'active' : 'inactive'}`}>
                         <div className="promo-header">
-                            <h3>{promo.name}</h3>
+                            <h3>{promo.code}</h3>
                             <button
-                                onClick={() => handleToggle(promo.id)}
+                                onClick={() => handleToggle(promo)}
                                 className={`toggle-btn ${promo.isActive ? 'on' : 'off'}`}
                             >
                                 {promo.isActive ? '✓ Đang chạy' : '✕ Tắt'}
@@ -86,28 +161,34 @@ const PromotionsManagement = () => {
 
                         <div className="promo-details">
                             <div className="promo-info">
-                                <span className="label">Giảm giá:</span>
-                                <span className="value discount">{(promo.discountRate * 100).toFixed(0)}%</span>
+                                <span className="label">Mô tả:</span>
+                                <span className="value discount">{promo.description}</span>
+                            </div>
+
+                            <div className="promo-info">
+                                <span className="label">Giảm:</span>
+                                <span className="value">{promo.discountValue}{promo.discountType === 'percentage' ? '%' : '₫'}</span>
+                            </div>
+
+                            <div className="promo-info">
+                                <span className="label">Đơn tối thiểu:</span>
+                                <span className="value">{Number(promo.minOrderValue || 0).toLocaleString()}₫</span>
                             </div>
 
                             <div className="promo-info">
                                 <span className="label">Từ:</span>
-                                <span className="value">{promo.startDate}</span>
+                                <span className="value">{String(promo.startDate).slice(0, 10)}</span>
                             </div>
 
                             <div className="promo-info">
                                 <span className="label">Đến:</span>
-                                <span className="value">{promo.endDate}</span>
+                                <span className="value">{String(promo.endDate).slice(0, 10)}</span>
                             </div>
 
                             <div className="promo-categories">
-                                {promo.categories.map((cat, idx) => (
-                                    <span key={idx} className="category-tag">{cat}</span>
+                                {(promo.applicableCategories || []).map((cat) => (
+                                    <span key={cat} className="category-tag">{cat}</span>
                                 ))}
-                            </div>
-
-                            <div className="promo-stats">
-                                📚 {getAffectedBooks(promo)} sách áp dụng
                             </div>
                         </div>
 
@@ -115,7 +196,7 @@ const PromotionsManagement = () => {
                             <button onClick={() => handleEdit(promo)} className="btn-edit-promo">
                                 ✏️ Sửa
                             </button>
-                            <button onClick={() => handleDelete(promo.id, promo.name)} className="btn-delete-promo">
+                            <button onClick={() => handleDelete(promo._id, promo.code)} className="btn-delete-promo">
                                 🗑️ Xóa
                             </button>
                         </div>
@@ -133,11 +214,22 @@ const PromotionsManagement = () => {
 
                         <form onSubmit={handleSubmit} className="promo-form">
                             <div className="form-group">
-                                <label>Tên khuyến mãi *</label>
+                                <label>Mã khuyến mãi *</label>
                                 <input
                                     type="text"
-                                    value={formData.name}
-                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                    value={formData.code}
+                                    onChange={(e) => setFormData({ ...formData, code: e.target.value })}
+                                    required
+                                    className="input"
+                                />
+                            </div>
+
+                            <div className="form-group">
+                                <label>Mô tả *</label>
+                                <input
+                                    type="text"
+                                    value={formData.description}
+                                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                                     required
                                     className="input"
                                 />
@@ -168,15 +260,58 @@ const PromotionsManagement = () => {
                             </div>
 
                             <div className="form-group">
-                                <label>Giảm giá (%) *</label>
+                                <label>Loại giảm giá *</label>
+                                <select
+                                    value={formData.discountType}
+                                    onChange={(e) => setFormData({ ...formData, discountType: e.target.value })}
+                                    className="input"
+                                >
+                                    <option value="percentage">Phần trăm</option>
+                                    <option value="fixed">Số tiền cố định</option>
+                                </select>
+                            </div>
+
+                            <div className="form-group">
+                                <label>Giá trị giảm *</label>
                                 <input
                                     type="number"
                                     min="0"
-                                    max="100"
-                                    step="5"
-                                    value={formData.discountRate * 100}
-                                    onChange={(e) => setFormData({ ...formData, discountRate: parseFloat(e.target.value) / 100 })}
+                                    value={formData.discountValue}
+                                    onChange={(e) => setFormData({ ...formData, discountValue: e.target.value })}
                                     required
+                                    className="input"
+                                />
+                            </div>
+
+                            <div className="form-group">
+                                <label>Đơn hàng tối thiểu</label>
+                                <input
+                                    type="number"
+                                    min="0"
+                                    value={formData.minOrderValue}
+                                    onChange={(e) => setFormData({ ...formData, minOrderValue: e.target.value })}
+                                    className="input"
+                                />
+                            </div>
+
+                            <div className="form-group">
+                                <label>Giảm tối đa (chỉ phần trăm)</label>
+                                <input
+                                    type="number"
+                                    min="0"
+                                    value={formData.maxDiscount}
+                                    onChange={(e) => setFormData({ ...formData, maxDiscount: e.target.value })}
+                                    className="input"
+                                />
+                            </div>
+
+                            <div className="form-group">
+                                <label>Giới hạn lượt dùng</label>
+                                <input
+                                    type="number"
+                                    min="0"
+                                    value={formData.usageLimit}
+                                    onChange={(e) => setFormData({ ...formData, usageLimit: e.target.value })}
                                     className="input"
                                 />
                             </div>
@@ -188,12 +323,12 @@ const PromotionsManagement = () => {
                                         <label key={cat} className="checkbox-label">
                                             <input
                                                 type="checkbox"
-                                                checked={formData.categories.includes(cat)}
+                                                checked={formData.applicableCategories.includes(cat)}
                                                 onChange={(e) => {
                                                     if (e.target.checked) {
-                                                        setFormData({ ...formData, categories: [...formData.categories, cat] });
+                                                        setFormData({ ...formData, applicableCategories: [...formData.applicableCategories, cat] });
                                                     } else {
-                                                        setFormData({ ...formData, categories: formData.categories.filter(c => c !== cat) });
+                                                        setFormData({ ...formData, applicableCategories: formData.applicableCategories.filter(item => item !== cat) });
                                                     }
                                                 }}
                                             />

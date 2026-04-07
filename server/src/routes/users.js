@@ -4,6 +4,7 @@ import {
     getUserById,
     updateUser,
     deleteUser,
+    toggleUserBlock,
     addAddress,
     updateAddress,
     deleteAddress,
@@ -28,6 +29,7 @@ router.get('/wishlists/all', protect, adminOnly, getAllWishlists);
 router.get('/', protect, adminOnly, getUsers);
 router.get('/:id', protect, adminOnly, getUserById);
 router.put('/:id', protect, adminOnly, updateUser);
+router.put('/:id/block', protect, adminOnly, toggleUserBlock);
 router.delete('/:id', protect, adminOnly, deleteUser);
 
 // User routes - Address

@@ -13,6 +13,7 @@ import bookRoutes from './routes/books.js';
 import orderRoutes from './routes/orders.js';
 import userRoutes from './routes/users.js';
 import promotionRoutes from './routes/promotions.js';
+import analyticsRoutes from './routes/analytics.js';
 
 // Load env vars
 dotenv.config();
@@ -49,6 +50,7 @@ app.use('/api/books', bookRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/promotions', promotionRoutes);
+app.use('/api/analytics', analyticsRoutes);
 
 // Health check route
 app.get('/health', (req, res) => {

@@ -80,6 +80,13 @@ export const login = async (req, res) => {
             });
         }
 
+        if (user.isBlocked) {
+            return res.status(403).json({
+                success: false,
+                message: 'Tài khoản của bạn đã bị khóa'
+            });
+        }
+
         // Check password
         const isPasswordMatch = await user.comparePassword(password);
         if (!isPasswordMatch) {

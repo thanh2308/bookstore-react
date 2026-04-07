@@ -26,6 +26,26 @@ const OrdersManagement = () => {
         }
     };
 
+    const exportCsv = () => {
+        const rows = [
+            ['orderNumber', 'customer', 'status', 'totalPrice', 'createdAt'],
+            ...filteredOrders.map(order => [
+                order.orderNumber,
+                order.customer?.name || order.shippingAddress?.fullName || '',
+                order.status,
+                order.totalPrice,
+                order.createdAt
+            ])
+        ];
+
+        const csv = rows.map(row => row.map(value => `"${String(value ?? '').replaceAll('"', '""')}"`).join(',')).join('\n');
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'orders.csv';
+        link.click();
+    };
+
     const getStatusBadgeClass = (status) => {
         const classes = {
             pending: 'status-pending',
@@ -95,6 +115,9 @@ const OrdersManagement = () => {
                     className={`filter-btn ${filterStatus === 'delivered' ? 'active' : ''}`}
                 >
                     Đã giao ({allOrders.filter(o => o.status === 'delivered').length})
+                </button>
+                <button onClick={exportCsv} className="filter-btn">
+                    Export CSV
                 </button>
             </div>
 

@@ -27,6 +27,13 @@ export const protect = async (req, res, next) => {
             });
         }
 
+        if (req.user.isBlocked) {
+            return res.status(403).json({
+                success: false,
+                message: 'Tài khoản đã bị khóa'
+            });
+        }
+
         next();
     } catch (error) {
         return res.status(401).json({

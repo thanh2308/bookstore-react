@@ -1,29 +1,69 @@
-import React, { useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { toggleUserStatus, updateUserRole } from '../../redux/usersSlice';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useToast } from '../../components/Toast';
+import userService from '../../services/userService';
 import './UsersManagement.css';
 
 const UsersManagement = () => {
-    const dispatch = useDispatch();
-    const { success } = useToast();
-    const users = useSelector(state => state.users.users);
+    const { success, error: showError } = useToast();
+    const [users, setUsers] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
 
-    const filteredUsers = users.filter(user =>
-        user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    useEffect(() => {
+        const loadUsers = async () => {
+            setLoading(true);
+            try {
+                const data = await userService.getUsers({ limit: 100 });
+                setUsers(data.users || []);
+            } catch (error) {
+                showError(error.message || 'Không tải được danh sách người dùng');
+            } finally {
+                setLoading(false);
+            }
+        };
 
-    const handleToggleStatus = (userId, userName) => {
-        dispatch(toggleUserStatus(userId));
-        success(`Đã cập nhật trạng thái user ${userName}!`);
+        loadUsers();
+    }, [showError]);
+
+    const filteredUsers = useMemo(() => {
+        return users.filter((user) => {
+            const name = (user.name || '').toLowerCase();
+            const email = (user.email || '').toLowerCase();
+            const keyword = searchTerm.toLowerCase();
+            return name.includes(keyword) || email.includes(keyword);
+        });
+    }, [users, searchTerm]);
+
+    const handleRoleChange = async (userId, newRole, userName) => {
+        try {
+            const data = await userService.updateUser(userId, { role: newRole });
+            setUsers(prev => prev.map(user => user._id === userId ? { ...user, role: data.user.role } : user));
+            success(`Đã cập nhật quyền ${userName} thành ${newRole}!`);
+        } catch (error) {
+            showError(error.message || 'Không cập nhật được quyền');
+        }
     };
 
-    const handleRoleChange = (userId, newRole, userName) => {
-        dispatch(updateUserRole({ userId, role: newRole }));
-        success(`Đã cập nhật quyền ${userName} thành ${newRole}!`);
+    const handleToggleStatus = async (userId, userName) => {
+        try {
+            const data = await userService.toggleUserBlock(userId);
+            setUsers(prev => prev.map(user => user._id === userId ? { ...user, isBlocked: data.user.isBlocked } : user));
+            success(`Đã cập nhật trạng thái user ${userName}!`);
+        } catch (error) {
+            showError(error.message || 'Không cập nhật được trạng thái');
+        }
     };
+
+    if (loading) {
+        return (
+            <div className="users-management">
+                <div className="loading-state">
+                    <div className="spinner"></div>
+                    <p>Đang tải người dùng...</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="users-management">
@@ -40,8 +80,8 @@ const UsersManagement = () => {
                 <div className="stat-card-small">
                     <span className="stat-icon">✅</span>
                     <div>
-                        <p>Active</p>
-                        <h3>{users.filter(u => u.status === 'active').length}</h3>
+                        <p>Đang hoạt động</p>
+                        <h3>{users.filter(u => !u.isBlocked).length}</h3>
                     </div>
                 </div>
                 <div className="stat-card-small">
@@ -71,20 +111,20 @@ const UsersManagement = () => {
                             <th>Email</th>
                             <th>Quyền</th>
                             <th>Trạng Thái</th>
-                            <th>Ngày Tham Gia</th>
+                            <th>Ngày Tạo</th>
                             <th>Đơn Hàng</th>
                             <th>Hành Động</th>
                         </tr>
                     </thead>
                     <tbody>
                         {filteredUsers.map((user) => (
-                            <tr key={user.id}>
+                            <tr key={user._id}>
                                 <td className="user-name-cell">{user.name}</td>
                                 <td>{user.email}</td>
                                 <td>
                                     <select
                                         value={user.role}
-                                        onChange={(e) => handleRoleChange(user.id, e.target.value, user.name)}
+                                        onChange={(e) => handleRoleChange(user._id, e.target.value, user.name)}
                                         className="role-select"
                                     >
                                         <option value="user">User</option>
@@ -92,18 +132,18 @@ const UsersManagement = () => {
                                     </select>
                                 </td>
                                 <td>
-                                    <span className={`status-pill ${user.status === 'active' ? 'active' : 'blocked'}`}>
-                                        {user.status === 'active' ? '✓ Active' : '✕ Blocked'}
+                                    <span className={`status-pill ${user.isBlocked ? 'blocked' : 'active'}`}>
+                                        {user.isBlocked ? '✕ Blocked' : '✓ Active'}
                                     </span>
                                 </td>
-                                <td>{user.joinDate}</td>
-                                <td className="orders-count">{user.totalOrders}</td>
+                                <td>{new Date(user.createdAt).toLocaleDateString('vi-VN')}</td>
+                                <td className="orders-count">{user.orderHistory?.length || 0}</td>
                                 <td>
                                     <button
-                                        onClick={() => handleToggleStatus(user.id, user.name)}
-                                        className={`btn-toggle ${user.status === 'active' ? 'btn-block' : 'btn-unblock'}`}
+                                        onClick={() => handleToggleStatus(user._id, user.name)}
+                                        className={`btn-toggle ${user.isBlocked ? 'btn-unblock' : 'btn-block'}`}
                                     >
-                                        {user.status === 'active' ? '🚫 Block' : '✅ Unblock'}
+                                        {user.isBlocked ? '✅ Unblock' : '🚫 Block'}
                                     </button>
                                 </td>
                             </tr>
