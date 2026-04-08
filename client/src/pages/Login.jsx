@@ -20,7 +20,7 @@ const Login = () => {
     useEffect(() => {
         if (isAuthenticated) {
             success('Đăng nhập thành công!');
-            navigate('/');a
+            navigate('/');
         }
     }, [isAuthenticated, navigate, success]);
 

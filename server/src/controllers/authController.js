@@ -1,6 +1,7 @@
 import User from '../models/User.js';
 import crypto from 'crypto';
 import emailService from '../services/emailService.js'; 
+
 // @desc    Register new user
 // @route   POST /api/auth/register
 // @access  Public
@@ -71,7 +72,7 @@ export const login = async (req, res) => {
             });
         }
 
-        // Check user exists
+        // Check user exists (VÀ lấy luôn cả trường password đã bị ẩn)
         const user = await User.findOne({ email }).select('+password');
         if (!user) {
             return res.status(401).json({
@@ -87,12 +88,12 @@ export const login = async (req, res) => {
             });
         }
 
-        // Check password
         const isPasswordMatch = await user.comparePassword(password);
+        
         if (!isPasswordMatch) {
             return res.status(401).json({
                 success: false,
-                message: 'Email hoặc mật khẩu không đúng'
+                message: 'Email hoặc mật khẩu không đúng' 
             });
         }
 
@@ -106,7 +107,10 @@ export const login = async (req, res) => {
                 id: user._id,
                 name: user.name,
                 email: user.email,
-                role: user.role
+                phone: user.phone,
+                role: user.role,
+                avatar: user.avatar,
+                addresses: user.addresses
             }
         });
     } catch (error) {
@@ -141,12 +145,19 @@ export const getMe = async (req, res) => {
 // @access  Private
 export const updateProfile = async (req, res) => {
     try {
-        const { name, email } = req.body;
+        const { name, email, phone, newAddress } = req.body;
 
         const user = await User.findById(req.user.id);
 
         if (user) {
             user.name = name || user.name;
+            if (phone !== undefined) {
+                user.phone = phone;
+            }
+            
+            if (newAddress) {
+                user.addresses.push(newAddress);
+            }
 
             if (email && email !== user.email) {
                 // Check if new email already exists
@@ -168,7 +179,10 @@ export const updateProfile = async (req, res) => {
                     id: updatedUser._id,
                     name: updatedUser.name,
                     email: updatedUser.email,
-                    role: updatedUser.role
+                    phone: updatedUser.phone,
+                    avatar: updatedUser.avatar,
+                    role: updatedUser.role,
+                    addresses: updatedUser.addresses
                 }
             });
         } else {
@@ -233,21 +247,16 @@ export const forgotPassword = async (req, res) => {
             });
         }
 
-        // 1. Tạo chuỗi token ngẫu nhiên (chưa mã hóa) để gửi qua email
         const resetToken = crypto.randomBytes(20).toString('hex');
 
-        // 2. Mã hóa token và lưu vào database (để đối chiếu sau này)
         user.resetPasswordToken = crypto.createHash('sha256').update(resetToken).digest('hex');
         
-        // 3. Đặt thời gian hết hạn cho token (10 phút)
         user.resetPasswordExpire = Date.now() + 10 * 60 * 1000;
         await user.save({ validateBeforeSave: false });
 
-        // 4. Tạo URL gửi vào email (Trỏ về trang Frontend mà bạn sẽ làm ở React)
         const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
 
         try {
-            // Gọi hàm gửi email
             await emailService.sendResetPasswordEmail(user, resetUrl);
 
             res.status(200).json({
@@ -255,7 +264,6 @@ export const forgotPassword = async (req, res) => {
                 message: 'Email khôi phục mật khẩu đã được gửi'
             });
         } catch (error) {
-            // Nếu gửi mail lỗi, xóa token trong DB đi
             user.resetPasswordToken = undefined;
             user.resetPasswordExpire = undefined;
             await user.save({ validateBeforeSave: false });
@@ -275,13 +283,11 @@ export const forgotPassword = async (req, res) => {
 // @access  Public
 export const resetPassword = async (req, res) => {
     try {
-        // 1. Lấy token từ URL (req.params.token) và mã hóa lại để so sánh với DB
         const resetPasswordToken = crypto.createHash('sha256').update(req.params.token).digest('hex');
 
-        // 2. Tìm user có mã token khớp và thời gian chưa hết hạn
         const user = await User.findOne({
             resetPasswordToken,
-            resetPasswordExpire: { $gt: Date.now() } // $gt: greater than (lớn hơn thời gian hiện tại)
+            resetPasswordExpire: { $gt: Date.now() }
         });
 
         if (!user) {
@@ -291,15 +297,12 @@ export const resetPassword = async (req, res) => {
             });
         }
 
-        // 3. Cập nhật mật khẩu mới (nhờ file User.js nó sẽ tự động băm)
         user.password = req.body.password;
 
-        // Xóa bỏ token khôi phục
         user.resetPasswordToken = undefined;
         user.resetPasswordExpire = undefined;
         await user.save();
 
-        // 4. Tự động đăng nhập cho user sau khi đổi pass thành công
         const token = user.generateToken();
 
         res.status(200).json({

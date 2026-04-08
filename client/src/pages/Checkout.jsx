@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { createOrder, clearError } from '../redux/ordersSlice';
 import { clearCart } from '../redux/cartSlice';
 import { useToast } from '../components/Toast';
+import axios from 'axios';
 import './Checkout.css';
 
 const Checkout = () => {
@@ -143,11 +144,32 @@ const Checkout = () => {
         };
 
         try {
-            const result = await dispatch(createOrder(orderData)).unwrap();
-            dispatch(clearCart());
-            setSubmitted(true);
-            success('Đặt hàng thành công!');
-            setTimeout(() => navigate('/my-orders'), 2000);
+            // 1. Lưu đơn hàng vào Database trước (Trạng thái mặc định chắc là Pending)
+            const result = await dispatch(createOrder(orderData)).unwrap(); 
+            
+            // 2. RẼ NHÁNH THANH TOÁN
+            if (paymentMethod === 'VNPay') {
+                // Nếu chọn VNPay -> Gọi API tạo link thanh toán
+                const res = await axios.post('http://localhost:5000/api/payment/create_payment_url', {
+                    amount: finalTotal, 
+                    orderId: result._id || orderData.orderNumber, // Lấy ID đơn hàng vừa tạo
+                    orderDescription: `Thanh toan don hang ${shippingInfo.phone}`
+                });
+
+                if (res.data.paymentUrl) {
+                    // Xóa giỏ hàng trước khi bay sang VNPay
+                    dispatch(clearCart()); 
+                    // Chuyển hướng người dùng sang trang của VNPay
+                    window.location.href = res.data.paymentUrl; 
+                }
+            } else {
+                // Nếu là COD hoặc các phương thức khác -> Xử lý như cũ
+                dispatch(clearCart());
+                setSubmitted(true);
+                success('Đặt hàng thành công!');
+                setTimeout(() => navigate('/my-orders'), 2000);
+            }
+
         } catch (err) {
             console.error('Order creation failed:', err);
             showToastError(err.message || 'Đặt hàng thất bại. Vui lòng thử lại!');

@@ -14,6 +14,7 @@ import orderRoutes from './routes/orders.js';
 import userRoutes from './routes/users.js';
 import promotionRoutes from './routes/promotions.js';
 import analyticsRoutes from './routes/analytics.js';
+import paymentRoutes from './routes/payment.js';
 
 // Load env vars
 dotenv.config();
@@ -51,6 +52,7 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/promotions', promotionRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/payment', paymentRoutes);
 
 // Health check route
 app.get('/health', (req, res) => {

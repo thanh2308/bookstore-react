@@ -98,7 +98,11 @@ const Header = () => {
                                 </div>
                                 {isUserDropdownOpen && (
                                     <div className="user-dropdown">
-                                        <button onClick={handleLogout} className="dropdown-item">
+                                        {/* THÊM NÚT PROFILE VÀO DROP DOWN MENU Ở ĐÂY */}
+                                        <Link to="/profile" className="dropdown-item" onClick={closeMenus}>
+                                            Thông tin cá nhân
+                                        </Link>
+                                        <button onClick={handleLogout} className="dropdown-item" style={{ color: '#dc2626' }}>
                                             Đăng xuất
                                         </button>
                                     </div>
@@ -159,11 +163,19 @@ const Header = () => {
                                         </>
                                     )}
                                     {isAuthenticated ? (
-                                        <li>
-                                            <button onClick={handleLogout} className="mobile-nav-link mobile-logout">
-                                                Đăng xuất
-                                            </button>
-                                        </li>
+                                        <>
+                                            {/* THÊM NÚT PROFILE CHO MENU ĐIỆN THOẠI */}
+                                            <li>
+                                                <Link to="/profile" className="mobile-nav-link" onClick={closeMenus}>
+                                                    👤 Thông tin cá nhân
+                                                </Link>
+                                            </li>
+                                            <li>
+                                                <button onClick={handleLogout} className="mobile-nav-link mobile-logout">
+                                                    Đăng xuất
+                                                </button>
+                                            </li>
+                                        </>
                                     ) : (
                                         <li>
                                             <Link to="/login" className="mobile-nav-link" onClick={closeMenus}>

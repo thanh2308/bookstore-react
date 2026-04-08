@@ -17,6 +17,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
 import MyOrders from './pages/MyOrders';
+import PaymentResult from './pages/PaymentResult';
 import OrderSuccess from './pages/OrderSuccess';
 import OrderDetail from './pages/OrderDetail';
 import AdminLayout from './admin/AdminLayout';
@@ -48,11 +49,11 @@ function App() {
                                 <Route path="/login" element={<Login />} />
                                 <Route path="/register" element={<Register />} />
                                 <Route path="/profile" element={<Profile />} />
-
                                 {/* User Order Routes */}
                                 <Route path="/my-orders" element={<ProtectedRoute><MyOrders /></ProtectedRoute>} />
                                 <Route path="/orders/:id" element={<ProtectedRoute><OrderDetail /></ProtectedRoute>} />
                                 <Route path="/order-success" element={<ProtectedRoute><OrderSuccess /></ProtectedRoute>} />
+                                <Route path="/payment-result" element={<PaymentResult />} />
 
                                 {/* Admin Routes - Protected */}
                                 <Route path="/admin" element={<ProtectedAdminRoute><AdminLayout /></ProtectedAdminRoute>}>
