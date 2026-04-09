@@ -39,3 +39,106 @@
     color: #666;
     font-size: 16px;
 }
+
+/* --- SKELETON STYLES --- */
+.skeleton {
+    background: #e0e0e0;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s infinite;
+    border-radius: 4px;
+}
+
+@keyframes skeleton-loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* BookCard Skeleton */
+.book-card-skeleton {
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    overflow: hidden;
+    height: 100%;
+    padding-bottom: 15px;
+}
+
+.skeleton-image {
+    width: 100%;
+    height: 250px;
+    border-radius: 0;
+}
+
+.skeleton-content-wrapper {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.skeleton-title {
+    height: 20px;
+    width: 80%;
+}
+
+.skeleton-text {
+    height: 14px;
+    width: 60%;
+}
+
+.skeleton-price {
+    height: 24px;
+    width: 40%;
+    margin-top: auto;
+}
+
+/* BookDetail Skeleton */
+.book-detail-skeleton {
+    display: flex;
+    gap: 40px;
+    padding: 40px 0;
+}
+
+@media (max-width: 768px) {
+    .book-detail-skeleton {
+        flex-direction: column;
+    }
+}
+
+.skeleton-detail-image-wrapper {
+    width: 350px;
+    height: 500px;
+    flex-shrink: 0;
+}
+
+.skeleton-detail-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.skeleton-detail-badge {
+    height: 24px;
+    width: 100px;
+    border-radius: 12px;
+}
+
+.skeleton-detail-title {
+    height: 40px;
+    width: 80%;
+}
+
+.skeleton-detail-text {
+    height: 20px;
+    width: 60%;
+}
+
+.skeleton-detail-block {
+    height: 120px;
+    width: 100%;
+    margin-top: 20px;
+}

@@ -137,4 +137,16 @@ const BookCard = ({ book }) => {
     );
 };
 
+export const BookCardSkeleton = () => (
+    <div className="book-card-skeleton">
+        <div className="skeleton skeleton-image"></div>
+        <div className="skeleton-content-wrapper">
+            <div className="skeleton skeleton-title"></div>
+            <div className="skeleton skeleton-text"></div>
+            <div className="skeleton skeleton-text" style={{ width: '40%' }}></div>
+            <div className="skeleton skeleton-price"></div>
+        </div>
+    </div>
+);
+
 export default BookCard;

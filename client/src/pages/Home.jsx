@@ -7,7 +7,7 @@ import {
     setPage,
     fetchBooks
 } from '../redux/booksSlice';
-import BookCard from '../components/BookCard';
+import BookCard, { BookCardSkeleton } from '../components/BookCard';
 import Pagination from '../components/Pagination';
 import './Home.css';
 
@@ -123,9 +123,8 @@ const Home = () => {
                     </div>
 
                     {loading ? (
-                        <div className="loading-state">
-                            <div className="spinner"></div>
-                            <p>Đang tải sách...</p>
+                        <div className="books-grid">
+                            {[1, 2, 3, 4, 5, 6, 7, 8].map(n => <BookCardSkeleton key={n} />)}
                         </div>
                     ) : error ? (
                         <div className="error-state">

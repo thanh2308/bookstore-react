@@ -95,9 +95,15 @@ const BookDetail = () => {
     if (loading) {
         return (
             <div className="container">
-                <div className="loading-state">
-                    <div className="spinner"></div>
-                    <p>Đang tải thông tin sách...</p>
+                <div className="book-detail-skeleton">
+                    <div className="skeleton skeleton-detail-image-wrapper"></div>
+                    <div className="skeleton-detail-info">
+                        <div className="skeleton skeleton-detail-badge"></div>
+                        <div className="skeleton skeleton-detail-title"></div>
+                        <div className="skeleton skeleton-detail-text"></div>
+                        <div className="skeleton skeleton-detail-text" style={{ width: '40%' }}></div>
+                        <div className="skeleton skeleton-detail-block"></div>
+                    </div>
                 </div>
             </div>
         );

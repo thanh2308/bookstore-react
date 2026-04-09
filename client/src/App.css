@@ -5,11 +5,30 @@
     --primary-light: #818cf8;
     --secondary-color: #ec4899;
     --accent-color: #f59e0b;
+
+    /* Light mode tokens */
     --text-primary: #1f2937;
     --text-secondary: #6b7280;
+    --text-muted: #9ca3af;
     --bg-primary: #ffffff;
     --bg-secondary: #f9fafb;
+    --bg-tertiary: #f3f4f6;
     --border-color: #e5e7eb;
+    --card-bg: #ffffff;
+    --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --input-bg: #ffffff;
+    --input-border: #e5e7eb;
+    --header-text: rgba(255,255,255,0.88);
+    --dropdown-bg: #ffffff;
+    --dropdown-header-bg: #f8f9ff;
+    --dropdown-item-hover: #f5f3ff;
+    --drawer-bg: #ffffff;
+    --drawer-user-bg: #f8f9ff;
+    --drawer-link-color: #374151;
+    --drawer-link-hover-bg: #f5f3ff;
+    --drawer-link-hover-color: #4f46e5;
+    --divider-color: #f0f1f5;
+
     --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
     --spacing-md: 1rem;
@@ -17,6 +36,39 @@
     --spacing-xl: 2rem;
     --radius-lg: 0.75rem;
     --transition-normal: 250ms ease-in-out;
+}
+
+/* ── Dark Mode Tokens ── */
+[data-theme="dark"] {
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --bg-primary: #0f172a;
+    --bg-secondary: #1e293b;
+    --bg-tertiary: #334155;
+    --border-color: #334155;
+    --card-bg: #1e293b;
+    --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+    --input-bg: #1e293b;
+    --input-border: #475569;
+    --header-text: rgba(255,255,255,0.92);
+    --dropdown-bg: #1e293b;
+    --dropdown-header-bg: #0f172a;
+    --dropdown-item-hover: #312e81;
+    --drawer-bg: #1e293b;
+    --drawer-user-bg: #0f172a;
+    --drawer-link-color: #cbd5e1;
+    --drawer-link-hover-bg: #312e81;
+    --drawer-link-hover-color: #a5b4fc;
+    --divider-color: #334155;
+
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+}
+
+/* ── Smooth theme transition ── */
+*, *::before, *::after {
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.2s ease, box-shadow 0.3s ease;
 }
 
 * {
@@ -79,9 +131,10 @@ h1 {
 }
 
 .card {
-    background-color: var(--bg-primary);
+    background-color: var(--card-bg);
     border-radius: 1rem;
-    box-shadow: var(--shadow-md);
+    box-shadow: var(--card-shadow);
+    border: 1px solid var(--border-color);
     padding: var(--spacing-lg);
     transition: all var(--transition-normal);
 }
@@ -90,8 +143,10 @@ h1 {
     width: 100%;
     padding: 0.75rem 1rem;
     font-size: 1rem;
-    border: 2px solid var(--border-color);
+    border: 2px solid var(--input-border);
     border-radius: var(--radius-lg);
+    background-color: var(--input-bg);
+    color: var(--text-primary);
     outline: none;
     transition: all 0.15s ease-in-out;
 }
