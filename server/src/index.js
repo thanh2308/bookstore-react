@@ -35,9 +35,8 @@ app.use(helmet());
 
 // CORS configuration
 const configuredOrigins =
-  process.env.FRONTEND_URLS ||
   process.env.FRONTEND_URL ||
-  "http://localhost:5173";
+  "http://localhost:5173, https://bookstore-psi-lime-54.vercel.app/";
 const allowedOrigins = configuredOrigins
   .split(",")
   .map((origin) => origin.trim())
