@@ -355,7 +355,7 @@ const AiChat = () => {
             <textarea
               ref={inputRef}
               className="chat-input"
-              placeholder="Nhập tiêu chí tìm sách theo nhu cầu c"
+              placeholder="Nhập tiêu chí tìm sách theo nhu cầu của bạn,"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
