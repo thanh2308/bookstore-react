@@ -39,7 +39,7 @@ REM Wait for backend to start
 timeout /t 3 /nobreak > nul
 
 REM Start Frontend
-cd client
+cd ..\client
 echo.
 echo 🎨 Starting Frontend...
 
