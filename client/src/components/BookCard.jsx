@@ -15,20 +15,17 @@ const BookCard = ({ book }) => {
 
   const [showPreview, setShowPreview] = React.useState(false);
 
-  // Check wishlist
   const isInWishlist = wishlistItems.some((item) => {
     const itemId = item._id || item;
     const bookId = book._id || book.id;
     return itemId === bookId;
   });
 
-  // Add to cart
   const handleAddToCart = () => {
     dispatch(addToCart(book));
     success(`Đã thêm "${book.title}" vào giỏ hàng!`);
   };
 
-  // Wishlist toggle
   const handleToggleWishlist = () => {
     dispatch(toggleWishlistItem(book._id || book.id));
     if (!isInWishlist) {
@@ -38,7 +35,6 @@ const BookCard = ({ book }) => {
     }
   };
 
-  // Discount %
   const discountPercent = book.originalPrice
     ? Math.round(((book.originalPrice - book.price) / book.originalPrice) * 100)
     : 0;
@@ -46,12 +42,10 @@ const BookCard = ({ book }) => {
   return (
     <>
       <div className="book-card">
-        {/* Discount */}
         {discountPercent > 0 && (
           <div className="discount-badge">-{discountPercent}%</div>
         )}
 
-        {/* Wishlist */}
         <button
           onClick={handleToggleWishlist}
           className={`wishlist-btn ${isInWishlist ? "active" : ""}`}
@@ -59,13 +53,11 @@ const BookCard = ({ book }) => {
           {isInWishlist ? "❤️" : "🤍"}
         </button>
 
-        {/* IMAGE + HOVER */}
         <div className="book-image-wrapper">
           <Link to={`/book/${book._id || book.id}`}>
             <img src={book.image} alt={book.title} className="book-image" />
           </Link>
 
-          {/* Overlay hover */}
           <div className="overlay">
             <button
               className="preview-btn"
@@ -79,7 +71,6 @@ const BookCard = ({ book }) => {
           </div>
         </div>
 
-        {/* INFO */}
         <div className="book-info">
           <span className="book-category">{book.category}</span>
 
@@ -94,7 +85,6 @@ const BookCard = ({ book }) => {
             <span>({getReviewCount(book)} đánh giá)</span>
           </div>
 
-          {/* PRICE */}
           <div className="book-price-section">
             <div className="price-wrapper">
               <span className="current-price">
@@ -119,7 +109,6 @@ const BookCard = ({ book }) => {
         </div>
       </div>
 
-      {/* MODAL */}
       <BookPreviewModal
         book={book}
         isOpen={showPreview}

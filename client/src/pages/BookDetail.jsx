@@ -46,12 +46,6 @@ const BookDetail = () => {
     success(`Đã thêm ${quantity} cuốn vào giỏ hàng!`);
   };
 
-  // ✅ THÀNH VIÊN 4: Admin điều hướng đến chỉnh sửa sách
-  const handleEditBook = () => {
-    navigate(`/admin/books`);
-    success("Chuyển đến trang quản lý sách");
-  };
-
   const handleToggleWishlist = () => {
     if (!isAuthenticated) {
       navigate("/login");
@@ -84,13 +78,9 @@ const BookDetail = () => {
       }),
     );
 
-    console.log("Review result:", result);
-
     if (addBookReview.fulfilled.match(result)) {
       success("Đánh giá đã được gửi!");
       setReviewForm({ rating: 5, comment: "" });
-
-      // load lại review mới
       dispatch(fetchBookById(id));
     } else {
       alert(result.payload || "Không gửi được đánh giá");
@@ -175,7 +165,9 @@ const BookDetail = () => {
             </p>
 
             <div className="book-rating-section">
-              <span className="rating-stars">⭐ {getDisplayRating(book)}</span>
+              <span className="rating-stars">
+                ⭐ {getDisplayRating(book, { source: "array" })}
+              </span>
               <span className="rating-reviews">
                 ({visibleReviewCount} đánh giá)
               </span>
@@ -254,7 +246,6 @@ const BookDetail = () => {
           </div>
         </div>
 
-        {/* Tabs Section */}
         <div className="book-tabs">
           <div className="tabs-header">
             <button
@@ -372,7 +363,6 @@ const BookDetail = () => {
         </div>
       </div>
 
-      {/* Related Books Section */}
       {relatedBooks.length > 0 && (
         <section className="related-books-section">
           <div className="container">

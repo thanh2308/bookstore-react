@@ -21,8 +21,8 @@ export const getReviewCount = (book, options = {}) => {
   return fromNumReviews;
 };
 
-export const getDisplayRating = (book) => {
-  const reviewCount = getReviewCount(book);
+export const getDisplayRating = (book, options = {}) => {
+  const reviewCount = getReviewCount(book, options);
   if (reviewCount <= 0) {
     return "N/A";
   }
