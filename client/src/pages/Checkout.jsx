@@ -34,6 +34,7 @@ const Checkout = () => {
   const [voucher, setVoucher] = useState("");
   const [discount, setDiscount] = useState(0);
   const [applyingVoucher, setApplyingVoucher] = useState(false);
+  const [appliedVoucherCode, setAppliedVoucherCode] = useState("");
 
   const applyVoucher = async () => {
     if (!voucher) {
@@ -49,9 +50,11 @@ const Checkout = () => {
       );
       const discountValue = data?.promotion?.discount || 0;
       setDiscount(discountValue);
+      setAppliedVoucherCode(voucher.toUpperCase());
       success(`Áp dụng mã ${voucher.toUpperCase()} thành công!`);
     } catch (voucherError) {
       setDiscount(0);
+      setAppliedVoucherCode("");
       showToastError(voucherError.message || "Mã giảm giá không hợp lệ");
     } finally {
       setApplyingVoucher(false);
@@ -126,7 +129,7 @@ const Checkout = () => {
         city: shippingInfo.city,
       },
       paymentMethod: paymentMethod,
-      promotionCode: voucher ? voucher.toUpperCase() : undefined,
+      promotionCode: appliedVoucherCode || undefined,
       notes: shippingInfo.notes || "",
     };
 
@@ -344,6 +347,7 @@ const Checkout = () => {
                   onChange={(e) => {
                     setVoucher(e.target.value);
                     setDiscount(0);
+                    setAppliedVoucherCode("");
                   }}
                 >
                   <option value=""> Chọn voucher </option>
@@ -359,9 +363,9 @@ const Checkout = () => {
                   {applyingVoucher ? "Đang kiểm tra..." : "Áp dụng"}
                 </button>
 
-                {voucher && (
+                {appliedVoucherCode && (
                   <p className="voucher-applied">
-                    Đã áp dụng: <strong>{voucher}</strong>
+                    Đã áp dụng: <strong>{appliedVoucherCode}</strong>
                   </p>
                 )}
               </div>
