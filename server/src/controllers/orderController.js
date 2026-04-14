@@ -147,6 +147,20 @@ export const createOrder = async (req, res) => {
       session.endSession();
     }
 
+    if (error.name === "ValidationError") {
+      return res.status(400).json({
+        success: false,
+        message: error.message,
+      });
+    }
+
+    if (error.code === 11000) {
+      return res.status(400).json({
+        success: false,
+        message: "Mã đơn hàng bị trùng, vui lòng thử lại",
+      });
+    }
+
     const statusCode = error.statusCode || 500;
 
     res.status(statusCode).json({
