@@ -275,10 +275,6 @@ export const updateOrderStatus = async (req, res) => {
 
     order.status = status;
 
-    if (note) {
-      order.statusHistory[order.statusHistory.length - 1].note = note;
-    }
-
     if (status === "delivered") {
       order.deliveredAt = Date.now();
     }
@@ -297,6 +293,17 @@ export const updateOrderStatus = async (req, res) => {
     }
 
     await order.save();
+
+    if (note) {
+      const latestMatchingStatus = [...order.statusHistory]
+        .reverse()
+        .find((entry) => entry.status === status);
+
+      if (latestMatchingStatus) {
+        latestMatchingStatus.note = note;
+        await order.save();
+      }
+    }
 
     const user = await import("../models/User.js").then((m) =>
       m.default.findById(order.user),
