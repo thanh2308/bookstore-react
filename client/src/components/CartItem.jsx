@@ -9,12 +9,16 @@ import "./CartItem.css";
 
 const CartItem = ({ item }) => {
   const dispatch = useDispatch();
-  const availableStock = item.stockQuantity ?? item.countInStock ?? 0;
+  const rawStock = item.stockQuantity ?? item.countInStock;
+  const hasKnownStock = Number.isFinite(rawStock) && rawStock >= 0;
+  const availableStock = hasKnownStock ? rawStock : null;
+  const isOutOfStock = hasKnownStock && availableStock === 0;
+  const reachedStockLimit = hasKnownStock && item.quantity >= availableStock;
   const itemId = item._id || item.id;
 
   const handleIncrease = () => {
     // ❗ Chặn vượt tồn kho
-    if (availableStock > 0 && item.quantity >= availableStock) return;
+    if (isOutOfStock || reachedStockLimit) return;
     dispatch(increaseQuantity(itemId));
   };
 
@@ -27,7 +31,7 @@ const CartItem = ({ item }) => {
         <p className="cart-item-author">{item.author}</p>
 
         {/* ✅ Hiển thị tồn kho */}
-        <p className="stock">Còn lại: {availableStock}</p>
+        <p className="stock">Còn lại: {hasKnownStock ? availableStock : "--"}</p>
 
         <p className="cart-item-price">{item.price.toLocaleString("vi-VN")}₫</p>
       </div>
@@ -47,7 +51,7 @@ const CartItem = ({ item }) => {
           <button
             onClick={handleIncrease}
             className="quantity-btn"
-            disabled={availableStock > 0 && item.quantity >= availableStock} // ❗ disable luôn
+            disabled={isOutOfStock || reachedStockLimit} // ❗ disable luôn
           >
             +
           </button>
