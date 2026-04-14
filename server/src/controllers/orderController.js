@@ -264,6 +264,22 @@ export const getAllOrders = async (req, res) => {
 export const updateOrderStatus = async (req, res) => {
   try {
     const { status, note } = req.body;
+    const allowedStatuses = [
+      "pending",
+      "confirmed",
+      "processing",
+      "shipping",
+      "delivered",
+      "cancelled",
+    ];
+
+    if (!allowedStatuses.includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: "Trạng thái đơn hàng không hợp lệ",
+      });
+    }
+
     const order = await Order.findById(req.params.id);
 
     if (!order) {

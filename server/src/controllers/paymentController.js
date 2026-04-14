@@ -67,12 +67,16 @@ export const createPaymentUrl = async (req, res) => {
     }
 
     if (order.status === "cancelled") {
-      return res.status(400).json({ message: "Không thể thanh toán đơn hàng đã hủy" });
+      return res
+        .status(400)
+        .json({ message: "Không thể thanh toán đơn hàng đã hủy" });
     }
 
     amount = order.totalPrice;
     if (!Number.isFinite(amount) || amount <= 0) {
-      return res.status(400).json({ message: "Số tiền thanh toán không hợp lệ" });
+      return res
+        .status(400)
+        .json({ message: "Số tiền thanh toán không hợp lệ" });
     }
 
     orderId = order._id.toString();

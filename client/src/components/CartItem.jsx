@@ -31,7 +31,9 @@ const CartItem = ({ item }) => {
         <p className="cart-item-author">{item.author}</p>
 
         {/* ✅ Hiển thị tồn kho */}
-        <p className="stock">Còn lại: {hasKnownStock ? availableStock : "--"}</p>
+        <p className="stock">
+          Còn lại: {hasKnownStock ? availableStock : "--"}
+        </p>
 
         <p className="cart-item-price">{item.price.toLocaleString("vi-VN")}₫</p>
       </div>
