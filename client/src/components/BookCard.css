@@ -123,7 +123,7 @@
 .book-image-wrapper {
   position: relative;
   width: 100%;
-  padding-top: 140%;
+  padding-top: 148%;
   overflow: hidden;
   background: #f3f4f6;
 }
@@ -165,10 +165,10 @@
 }
 
 .book-info {
-  padding: 1rem 1rem 1.1rem;
+  padding: 1.05rem 1.05rem 1.2rem;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.55rem;
   flex-grow: 1;
 }
 
@@ -188,7 +188,7 @@
 
 .book-title {
   margin: 0;
-  font-size: 1.1rem;
+  font-size: 1.14rem;
   font-weight: 700;
   color: #1f2937;
   line-height: 1.4;
@@ -234,9 +234,9 @@
 .book-price-section {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.8rem;
   margin-top: auto;
-  padding-top: 0.75rem;
+  padding-top: 0.85rem;
   border-top: 1px solid #f3f4f6;
 }
 
@@ -272,9 +272,28 @@
   box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
 }
 
+@media (max-width: 1024px) {
+  .book-image-wrapper {
+    padding-top: 142%;
+  }
+
+  .book-info {
+    padding: 0.95rem 0.95rem 1.05rem;
+    gap: 0.45rem;
+  }
+
+  .book-title {
+    font-size: 1.05rem;
+  }
+
+  .current-price {
+    font-size: 1.35rem;
+  }
+}
+
 @media (max-width: 768px) {
   .book-image-wrapper {
-    padding-top: 130%;
+    padding-top: 136%;
   }
 
   .book-info {
@@ -284,6 +303,49 @@
   .book-title {
     font-size: 1.02rem;
     min-height: 2.7em;
+  }
+}
+
+@media (max-width: 480px) {
+  .book-image-wrapper {
+    padding-top: 130%;
+  }
+
+  .discount-badge {
+    font-size: 0.78rem;
+    padding: 0.28rem 0.6rem;
+  }
+
+  .wishlist-btn {
+    top: 2.8rem;
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    max-width: 34px;
+    min-height: 34px;
+    max-height: 34px;
+  }
+
+  .book-title {
+    font-size: 0.98rem;
+  }
+
+  .book-author,
+  .book-rating {
+    font-size: 0.84rem;
+  }
+
+  .current-price {
+    font-size: 1.25rem;
+  }
+
+  .original-price {
+    font-size: 0.9rem;
+  }
+
+  .add-to-cart-btn {
+    padding: 0.68rem 0.8rem;
+    font-size: 0.92rem;
   }
 }
 
