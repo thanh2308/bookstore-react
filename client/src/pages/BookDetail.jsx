@@ -133,6 +133,8 @@ const BookDetail = () => {
   const discountPercent = book.originalPrice
     ? Math.round(((book.originalPrice - book.price) / book.originalPrice) * 100)
     : 0;
+  const visibleReviewCount = getReviewCount(book, { source: "array" });
+  const totalReviewCount = getReviewCount(book, { source: "numReviews" });
 
   return (
     <div className="book-detail-page">
@@ -175,7 +177,7 @@ const BookDetail = () => {
             <div className="book-rating-section">
               <span className="rating-stars">⭐ {getDisplayRating(book)}</span>
               <span className="rating-reviews">
-                ({getReviewCount(book)} đánh giá)
+                ({visibleReviewCount} đánh giá)
               </span>
             </div>
 
@@ -265,7 +267,7 @@ const BookDetail = () => {
               className={`tab ${activeTab === "reviews" ? "active" : ""}`}
               onClick={() => setActiveTab("reviews")}
             >
-              Đánh giá ({getReviewCount(book)})
+              Đánh giá ({visibleReviewCount})
             </button>
           </div>
 
@@ -354,6 +356,10 @@ const BookDetail = () => {
                         )}
                       </div>
                     ))
+                  ) : totalReviewCount > 0 ? (
+                    <p className="no-reviews">
+                      Hiện chưa có danh sách đánh giá chi tiết để hiển thị.
+                    </p>
                   ) : (
                     <p className="no-reviews">
                       Chưa có đánh giá nào. Hãy là người đầu tiên!
