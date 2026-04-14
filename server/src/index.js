@@ -39,7 +39,7 @@ const normalizeOrigin = (value) => value.trim().replace(/\/+$/, "");
 const configuredOrigins =
   process.env.FRONTEND_URLS ||
   process.env.FRONTEND_URL ||
-  "http://localhost:5173,https://bookstore-tan-eta.vercel.app";
+  "http://localhost:5173,https://bookstore-react-xi.vercel.app,https://bookstore-tan-eta.vercel.app";
 const allowedOrigins = configuredOrigins
   .split(",")
   .map((origin) => normalizeOrigin(origin))
