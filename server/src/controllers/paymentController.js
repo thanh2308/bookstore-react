@@ -1,6 +1,8 @@
 import crypto from "crypto";
 import qs from "qs";
 import moment from "moment";
+import mongoose from "mongoose";
+import Order from "../models/Order.js";
 
 function sortObject(obj) {
   let sorted = {};
@@ -32,12 +34,42 @@ export const createPaymentUrl = async (req, res) => {
     let vnpUrl = process.env.VNPAY_URL;
     let returnUrl = process.env.VNPAY_RETURN_URL;
 
-    let amount = req.body.amount;
+    let amount = Number(req.body.amount);
     let bankCode = req.body.bankCode || "";
-    let orderId = req.body.orderId || moment(date).format("DDHHmmss");
+    let orderId = req.body.orderId;
+    if (!orderId) {
+      return res.status(400).json({ message: "Thiếu mã đơn hàng" });
+    }
+
     let orderInfo =
       req.body.orderDescription || `Thanh toan don hang ${orderId}`;
 
+    const orderQuery = mongoose.Types.ObjectId.isValid(orderId)
+      ? { $or: [{ _id: orderId }, { orderNumber: orderId }] }
+      : { orderNumber: orderId };
+
+    const order = await Order.findOne(orderQuery);
+    if (!order) {
+      return res.status(404).json({ message: "Không tìm thấy đơn hàng" });
+    }
+
+    if (
+      order.user.toString() !== req.user._id.toString() &&
+      req.user.role !== "admin"
+    ) {
+      return res
+        .status(403)
+        .json({ message: "Không có quyền thanh toán đơn hàng này" });
+    }
+
+    if (order.paymentStatus === "paid") {
+      return res.status(400).json({ message: "Đơn hàng đã được thanh toán" });
+    }
+
+    amount = order.totalPrice;
+    orderId = order._id.toString();
+    orderInfo =
+      req.body.orderDescription || `Thanh toan don hang ${order.orderNumber}`;
     let vnp_Params = {};
     vnp_Params["vnp_Version"] = "2.1.0";
     vnp_Params["vnp_Command"] = "pay";
@@ -73,7 +105,7 @@ export const createPaymentUrl = async (req, res) => {
 
 export const vnpayReturn = async (req, res) => {
   try {
-    let vnp_Params = req.query;
+    let vnp_Params = { ...req.query };
 
     let secureHash = vnp_Params["vnp_SecureHash"];
     delete vnp_Params["vnp_SecureHash"];
@@ -87,20 +119,45 @@ export const vnpayReturn = async (req, res) => {
     let signed = hmac.update(new Buffer.from(signData, "utf-8")).digest("hex");
 
     if (secureHash === signed) {
-      if (vnp_Params["vnp_ResponseCode"] === "00") {
-        res
-          .status(200)
-          .json({
-            code: vnp_Params["vnp_ResponseCode"],
-            message: "Thanh toán thành công",
-          });
+      const responseCode = vnp_Params["vnp_ResponseCode"];
+      const orderIdentifier = vnp_Params["vnp_TxnRef"];
+      const transactionId = vnp_Params["vnp_TransactionNo"];
+
+      let order = null;
+      if (orderIdentifier) {
+        const query = mongoose.Types.ObjectId.isValid(orderIdentifier)
+          ? {
+              $or: [{ _id: orderIdentifier }, { orderNumber: orderIdentifier }],
+            }
+          : { orderNumber: orderIdentifier };
+
+        order = await Order.findOne(query);
+      }
+
+      if (order) {
+        if (responseCode === "00") {
+          order.paymentStatus = "paid";
+          order.paymentDetails = {
+            transactionId: transactionId || order.paymentDetails?.transactionId,
+            paidAt: new Date(),
+          };
+        } else if (order.paymentStatus !== "paid") {
+          order.paymentStatus = "failed";
+        }
+
+        await order.save();
+      }
+
+      if (responseCode === "00") {
+        res.status(200).json({
+          code: responseCode,
+          message: "Thanh toán thành công",
+        });
       } else {
-        res
-          .status(200)
-          .json({
-            code: vnp_Params["vnp_ResponseCode"],
-            message: "Thanh toán thất bại hoặc bị hủy",
-          });
+        res.status(200).json({
+          code: responseCode,
+          message: "Thanh toán thất bại hoặc bị hủy",
+        });
       }
     } else {
       res.status(400).json({ code: "97", message: "Chữ ký không hợp lệ" });

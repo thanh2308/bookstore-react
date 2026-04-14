@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import axios from "axios";
 import { addToCart } from "../redux/cartSlice";
 import { useToast } from "../components/Toast";
+import api, { resolveAssetUrl } from "../services/api";
 import "./AiChat.css";
 
 // ─── Quick prompts để inspire user ───────────────
@@ -151,7 +151,7 @@ const BookResults = ({ books, category, onAddToCart }) => {
                     src={
                       book.image?.startsWith("http")
                         ? book.image
-                        : `http://localhost:5000${book.image}`
+                        : resolveAssetUrl(book.image)
                     }
                     alt={book.title}
                     onError={(e) => {
@@ -227,7 +227,7 @@ const AiChat = () => {
       setLastBooks(null);
 
       try {
-        const { data } = await axios.post("http://localhost:5000/api/ai/chat", {
+        const { data } = await api.post("/ai/chat", {
           message: trimmed,
         });
 
