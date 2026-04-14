@@ -66,7 +66,15 @@ export const createPaymentUrl = async (req, res) => {
       return res.status(400).json({ message: "Đơn hàng đã được thanh toán" });
     }
 
+    if (order.status === "cancelled") {
+      return res.status(400).json({ message: "Không thể thanh toán đơn hàng đã hủy" });
+    }
+
     amount = order.totalPrice;
+    if (!Number.isFinite(amount) || amount <= 0) {
+      return res.status(400).json({ message: "Số tiền thanh toán không hợp lệ" });
+    }
+
     orderId = order._id.toString();
     orderInfo =
       req.body.orderDescription || `Thanh toan don hang ${order.orderNumber}`;
