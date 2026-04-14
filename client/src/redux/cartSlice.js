@@ -16,6 +16,9 @@ const saveCartToLocalStorage = (state) => {
   localStorage.setItem("cart", JSON.stringify(state));
 };
 
+const normalizeStockQuantity = (value) =>
+  Number.isFinite(value) && value >= 0 ? value : null;
+
 const cartSlice = createSlice({
   name: "cart",
   initialState,
@@ -25,13 +28,12 @@ const cartSlice = createSlice({
       const itemId = newItem._id || newItem.id;
       const addedQuantity = newItem.quantity || 1;
       const maxStock =
-        Number.isFinite(newItem.stockQuantity) && newItem.stockQuantity > 0
-          ? newItem.stockQuantity
-          : null;
+        normalizeStockQuantity(newItem.stockQuantity) ??
+        normalizeStockQuantity(newItem.countInStock);
       const hasStockQuantity = Number.isFinite(maxStock);
 
       // Check hết hàng ngay từ đầu (hỗ trợ cả payload chỉ có inStock)
-      if (newItem.inStock === false || (hasStockQuantity && maxStock === 0)) {
+      if (newItem.inStock === false || maxStock === 0) {
         return;
       }
 
@@ -42,11 +44,14 @@ const cartSlice = createSlice({
       if (existingItem) {
         const newQuantity = existingItem.quantity + addedQuantity;
         const existingMaxStock =
-          Number.isFinite(existingItem.stockQuantity) &&
-          existingItem.stockQuantity > 0
-            ? existingItem.stockQuantity
-            : null;
+          normalizeStockQuantity(existingItem.stockQuantity) ??
+          normalizeStockQuantity(existingItem.countInStock);
         const existingHasStockQuantity = Number.isFinite(existingMaxStock);
+
+        if (hasStockQuantity) {
+          existingItem.stockQuantity = maxStock;
+          existingItem.countInStock = maxStock;
+        }
 
         existingItem.quantity =
           existingHasStockQuantity && newQuantity > existingMaxStock
@@ -68,6 +73,7 @@ const cartSlice = createSlice({
           price: newItem.price,
           image: newItem.image,
           stockQuantity: maxStock,
+          countInStock: maxStock,
           quantity: validQuantity,
           totalPrice: newItem.price * validQuantity,
         });
@@ -114,6 +120,15 @@ const cartSlice = createSlice({
       );
 
       if (existingItem) {
+        const maxStock =
+          normalizeStockQuantity(existingItem.stockQuantity) ??
+          normalizeStockQuantity(existingItem.countInStock);
+
+        if (Number.isFinite(maxStock) && existingItem.quantity >= maxStock) {
+          saveCartToLocalStorage(state);
+          return;
+        }
+
         existingItem.quantity++;
         existingItem.totalPrice = existingItem.price * existingItem.quantity;
 

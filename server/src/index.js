@@ -34,19 +34,22 @@ const app = express();
 app.use(helmet());
 
 // CORS configuration
+const normalizeOrigin = (value) => value.trim().replace(/\/+$/, "");
+
 const configuredOrigins =
+  process.env.FRONTEND_URLS ||
   process.env.FRONTEND_URL ||
-  "http://localhost:5173, https://bookstore-react-xi.vercel.app/";
+  "http://localhost:5173,https://bookstore-react-xi.vercel.app,https://bookstore-tan-eta.vercel.app";
 const allowedOrigins = configuredOrigins
   .split(",")
-  .map((origin) => origin.trim())
+  .map((origin) => normalizeOrigin(origin))
   .filter(Boolean);
 
 app.use(
   cors({
     origin: (origin, callback) => {
       // Allow requests without an Origin header (e.g. mobile apps, health checks, curl)
-      if (!origin || allowedOrigins.includes(origin)) {
+      if (!origin || allowedOrigins.includes(normalizeOrigin(origin))) {
         return callback(null, true);
       }
       return callback(new Error("CORS policy: origin is not allowed"));
