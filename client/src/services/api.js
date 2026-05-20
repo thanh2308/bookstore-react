@@ -14,6 +14,16 @@ export const resolveAssetUrl = (assetPath) => {
   return `${API_ORIGIN}${normalizedPath}`;
 };
 
+export const getOptimizedImageUrl = (assetPath, transform = "w_400,f_auto,q_auto") => {
+  const url = resolveAssetUrl(assetPath);
+
+  if (!url || !url.includes("res.cloudinary.com") || url.includes("/upload/" + transform)) {
+    return url;
+  }
+
+  return url.replace("/upload/", `/upload/${transform}/`);
+};
+
 // Create axios instance
 const api = axios.create({
   baseURL: API_BASE_URL,

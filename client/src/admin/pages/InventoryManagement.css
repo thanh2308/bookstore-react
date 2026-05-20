@@ -58,8 +58,9 @@
 }
 
 .inventory-table-container {
-    background: white;
-    border-radius: 1rem;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
     overflow: hidden;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
@@ -70,24 +71,24 @@
 }
 
 .inventory-table thead {
-    background-color: #f9fafb;
+    background-color: var(--bg-primary);
 }
 
 .inventory-table th {
     padding: 1rem;
     text-align: left;
     font-weight: 600;
-    color: #374151;
-    border-bottom: 2px solid #e5e7eb;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-color);
 }
 
 .inventory-table td {
     padding: 1rem;
-    border-bottom: 1px solid #f3f4f6;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .inventory-table tbody tr:hover {
-    background-color: #f9fafb;
+    background-color: var(--bg-primary);
 }
 
 .inventory-table tbody tr.out-of-stock {
@@ -113,19 +114,39 @@
 
 .book-title-small {
     font-weight: 600;
-    color: #1f2937;
+    color: var(--text-primary);
     margin-bottom: 0.25rem;
 }
 
 .book-author-small {
     font-size: 0.875rem;
-    color: #6b7280;
+    color: var(--text-secondary);
 }
 
 .stock-quantity {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 3rem;
+    padding: 0.35rem 0.5rem;
+    border: 1px solid transparent;
+    background: transparent;
     font-size: 1.25rem;
     font-weight: 700;
-    color: #1f2937;
+    color: var(--text-primary);
+    cursor: pointer;
+}
+
+.stock-quantity:hover {
+    border-color: var(--accent-color);
+    border-radius: var(--radius-md);
+}
+
+.stock-inline-input {
+    width: 5.5rem;
+    padding: 0.45rem 0.55rem;
+    border: 1px solid var(--accent-color);
+    border-radius: var(--radius-md);
 }
 
 .status-badge.in-stock {
@@ -172,7 +193,7 @@
 .empty-state {
     text-align: center;
     padding: 3rem;
-    color: #9ca3af;
+    color: var(--text-muted);
 }
 
 @media (max-width: 768px) {

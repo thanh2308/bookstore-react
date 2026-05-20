@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useToast } from '../../components/Toast';
 import promotionService from '../../services/promotionService';
+import AppIcon from '../../components/AppIcon';
 import './PromotionsManagement.css';
 
 const PromotionsManagement = () => {
@@ -9,6 +10,7 @@ const PromotionsManagement = () => {
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const [editingPromotion, setEditingPromotion] = useState(null);
+    const [deleteTarget, setDeleteTarget] = useState(null);
 
     const categories = ['Kỹ năng sống', 'Tiểu thuyết', 'Khoa học', 'Kinh tế', 'Thiếu nhi', 'Văn học Việt Nam'];
 
@@ -98,15 +100,13 @@ const PromotionsManagement = () => {
         }
     };
 
-    const handleDelete = async (id, code) => {
-        if (!window.confirm(`Xóa khuyến mãi "${code}"?`)) {
-            return;
-        }
-
+    const handleDelete = async () => {
+        if (!deleteTarget) return;
         try {
-            await promotionService.deletePromotion(id);
-            setPromotions(prev => prev.filter(item => item._id !== id));
+            await promotionService.deletePromotion(deleteTarget.id);
+            setPromotions(prev => prev.filter(item => item._id !== deleteTarget.id));
             success('Đã xóa khuyến mãi!');
+            setDeleteTarget(null);
         } catch (error) {
             showError(error.message || 'Không xóa được khuyến mãi');
         }
@@ -129,8 +129,9 @@ const PromotionsManagement = () => {
     if (loading) {
         return (
             <div className="loading-state">
-                <div className="spinner"></div>
-                <p>Đang tải khuyến mãi...</p>
+                <div className="admin-table-skeleton" aria-label="Đang tải khuyến mãi">
+                    {[1, 2, 3].map((item) => <span className="skeleton admin-row-skeleton" key={item} />)}
+                </div>
             </div>
         );
     }
@@ -138,13 +139,13 @@ const PromotionsManagement = () => {
     return (
         <div className="promotions-management">
             <div className="page-header">
-                <h1>🎉 Quản Lý Khuyến Mãi</h1>
+                <h1><AppIcon name="gift" size={28} /> Quản Lý Khuyến Mãi</h1>
                 <button onClick={handleAddNew} className="btn btn-primary">
-                    ➕ Tạo Khuyến Mãi Mới
+                    <AppIcon name="plus" size={16} /> Tạo Khuyến Mãi Mới
                 </button>
             </div>
 
-            <p style={{ marginBottom: '1rem' }}>Tổng khuyến mãi: {promoCount}</p>
+            <p className="promo-count">Tổng khuyến mãi: {promoCount}</p>
 
             <div className="promotions-grid">
                 {promotions.map((promo) => (
@@ -155,7 +156,7 @@ const PromotionsManagement = () => {
                                 onClick={() => handleToggle(promo)}
                                 className={`toggle-btn ${promo.isActive ? 'on' : 'off'}`}
                             >
-                                {promo.isActive ? '✓ Đang chạy' : '✕ Tắt'}
+                                {promo.isActive ? <><AppIcon name="check" size={14} /> Đang chạy</> : <><AppIcon name="x" size={14} /> Tắt</>}
                             </button>
                         </div>
 
@@ -194,10 +195,10 @@ const PromotionsManagement = () => {
 
                         <div className="promo-actions">
                             <button onClick={() => handleEdit(promo)} className="btn-edit-promo">
-                                ✏️ Sửa
+                                <AppIcon name="edit" size={16} /> Sửa
                             </button>
-                            <button onClick={() => handleDelete(promo._id, promo.code)} className="btn-delete-promo">
-                                🗑️ Xóa
+                            <button onClick={() => setDeleteTarget({ id: promo._id, code: promo.code })} className="btn-delete-promo">
+                                <AppIcon name="trash" size={16} /> Xóa
                             </button>
                         </div>
                     </div>
@@ -208,8 +209,8 @@ const PromotionsManagement = () => {
                 <div className="modal-overlay" onClick={() => setShowModal(false)}>
                     <div className="promo-modal" onClick={(e) => e.stopPropagation()}>
                         <div className="modal-header">
-                            <h2>{editingPromotion ? '✏️ Sửa Khuyến Mãi' : '➕ Tạo Khuyến Mãi'}</h2>
-                            <button className="modal-close" onClick={() => setShowModal(false)}>✕</button>
+                            <h2><AppIcon name={editingPromotion ? 'edit' : 'plus'} size={22} /> {editingPromotion ? 'Sửa Khuyến Mãi' : 'Tạo Khuyến Mãi'}</h2>
+                            <button className="modal-close" onClick={() => setShowModal(false)}><AppIcon name="x" size={18} /></button>
                         </div>
 
                         <form onSubmit={handleSubmit} className="promo-form">
@@ -260,15 +261,24 @@ const PromotionsManagement = () => {
                             </div>
 
                             <div className="form-group">
-                                <label>Loại giảm giá *</label>
-                                <select
-                                    value={formData.discountType}
-                                    onChange={(e) => setFormData({ ...formData, discountType: e.target.value })}
-                                    className="input"
-                                >
-                                    <option value="percentage">Phần trăm</option>
-                                    <option value="fixed">Số tiền cố định</option>
-                                </select>
+                                <label>Loại promotion *</label>
+                                <div className="promo-type-selector" role="radiogroup" aria-label="Loại promotion">
+                                    {[
+                                        ['percentage', 'Coupon %'],
+                                        ['fixed', 'Giảm cố định'],
+                                    ].map(([value, label]) => (
+                                        <label key={value} className={formData.discountType === value ? 'selected' : ''}>
+                                            <input
+                                                type="radio"
+                                                name="discountType"
+                                                value={value}
+                                                checked={formData.discountType === value}
+                                                onChange={(e) => setFormData({ ...formData, discountType: e.target.value })}
+                                            />
+                                            {label}
+                                        </label>
+                                    ))}
+                                </div>
                             </div>
 
                             <div className="form-group">
@@ -347,6 +357,19 @@ const PromotionsManagement = () => {
                                 </button>
                             </div>
                         </form>
+                    </div>
+                </div>
+            )}
+
+            {deleteTarget && (
+                <div className="admin-confirm-overlay" role="dialog" aria-modal="true" aria-labelledby="delete-promo-title">
+                    <div className="admin-confirm-modal">
+                        <h2 id="delete-promo-title">Xóa khuyến mãi?</h2>
+                        <p>Mã "{deleteTarget.code}" sẽ không còn áp dụng được.</p>
+                        <div className="admin-confirm-actions">
+                            <button type="button" className="btn btn-secondary" onClick={() => setDeleteTarget(null)}>Hủy</button>
+                            <button type="button" className="btn btn-danger" onClick={handleDelete}>Xóa</button>
+                        </div>
                     </div>
                 </div>
             )}

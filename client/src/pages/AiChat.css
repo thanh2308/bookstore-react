@@ -12,7 +12,7 @@
 
 /* ─── Hero Banner ─────────────────────────────── */
 .ai-hero {
-  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 50%, #7c3aed 100%);
+  background: var(--hero-gradient);
   padding: 3rem 1.5rem 2rem;
   text-align: center;
   position: relative;
@@ -49,7 +49,6 @@
   font-weight: 800;
   color: white;
   margin-bottom: 0.5rem;
-  font-family: "Inter", sans-serif;
   line-height: 1.2;
 }
 
@@ -171,13 +170,13 @@
 }
 
 .message.ai .message-avatar {
-  background: linear-gradient(135deg, #6366f1, #7c3aed);
+  background: var(--brand-gradient);
   font-size: 0.9rem;
   box-shadow: 0 2px 8px rgba(99, 102, 241, 0.4);
 }
 
 .message.user .message-avatar {
-  background: linear-gradient(135deg, #ec4899, #db2777);
+  background: linear-gradient(135deg, var(--accent-color), #7c2d12);
   font-size: 0.9rem;
 }
 
@@ -198,7 +197,7 @@
 }
 
 .message.user .message-bubble {
-  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  background: var(--brand-gradient);
   color: white;
   border-bottom-right-radius: 4px;
 }
@@ -221,7 +220,7 @@
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #6366f1;
+  background: var(--accent-color);
   animation: typingBounce 1.2s infinite;
 }
 
@@ -273,7 +272,7 @@
 }
 
 .chat-input:focus {
-  border-color: #6366f1;
+  border-color: var(--accent-color);
 }
 .chat-input::placeholder {
   color: var(--text-muted);
@@ -284,7 +283,7 @@
   height: 44px;
   border-radius: 0.875rem;
   border: none;
-  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  background: var(--brand-gradient);
   color: white;
   cursor: pointer;
   display: flex;
@@ -293,7 +292,7 @@
   font-size: 1.1rem;
   transition: all 0.2s;
   flex-shrink: 0;
-  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.4);
+  box-shadow: 0 2px 8px rgba(28, 25, 23, 0.24);
 }
 
 .chat-send-btn:hover:not(:disabled) {
@@ -340,7 +339,7 @@
   border-bottom: 1px solid var(--border-color);
   font-weight: 700;
   font-size: 0.9rem;
-  color: #6366f1;
+  color: var(--accent-color);
 }
 
 .panel-body {
@@ -422,12 +421,12 @@
 .score-bar-fill {
   height: 100%;
   border-radius: 9999px;
-  background: linear-gradient(90deg, #6366f1, #7c3aed);
+  background: linear-gradient(90deg, var(--accent-color), #7c2d12);
   transition: width 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .score-bar-fill.top {
-  background: linear-gradient(90deg, #6366f1, #ec4899);
+  background: linear-gradient(90deg, var(--accent-color), #b91c1c);
 }
 
 /* Tokens display */
@@ -438,14 +437,14 @@
 }
 
 .token-chip {
-  background: rgba(99, 102, 241, 0.1);
-  color: #6366f1;
-  border: 1px solid rgba(99, 102, 241, 0.2);
+  background: #fff7ed;
+  color: var(--accent-color);
+  border: 1px solid rgba(180, 83, 9, 0.22);
   border-radius: 6px;
   padding: 0.2rem 0.55rem;
   font-size: 0.75rem;
   font-weight: 600;
-  font-family: "Courier New", monospace;
+  font-family: var(--font-mono);
 }
 
 [data-theme="dark"] .token-chip {
@@ -481,8 +480,8 @@
 }
 
 .books-count-badge {
-  background: rgba(99, 102, 241, 0.1);
-  color: #6366f1;
+  background: #fff7ed;
+  color: var(--accent-color);
   padding: 0.15rem 0.6rem;
   border-radius: 9999px;
   font-size: 0.75rem;
@@ -510,8 +509,8 @@
 
 .ai-book-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 28px rgba(99, 102, 241, 0.18);
-  border-color: #6366f1;
+  box-shadow: 0 12px 28px rgba(28, 25, 23, 0.16);
+  border-color: var(--accent-color);
 }
 
 .ai-book-link {
@@ -525,7 +524,7 @@
 .ai-book-img-wrap {
   aspect-ratio: 3/4;
   overflow: hidden;
-  background: linear-gradient(135deg, #f5f3ff, #ede9fe);
+  background: linear-gradient(135deg, #fff7ed, #e7e5e4);
 }
 
 .ai-book-img-wrap img {
@@ -549,7 +548,7 @@
 .ai-book-cat {
   font-size: 0.68rem;
   font-weight: 700;
-  color: #6366f1;
+  color: var(--accent-color);
   text-transform: uppercase;
   letter-spacing: 0.04em;
   margin-bottom: 0.3rem;
@@ -585,7 +584,7 @@
 .ai-book-price {
   font-size: 0.85rem;
   font-weight: 800;
-  color: #6366f1;
+  color: var(--secondary-color);
 }
 
 .ai-book-rating {
@@ -599,12 +598,19 @@
   border: none;
   border-radius: 0.7rem;
   padding: 0.55rem 0.8rem;
-  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  background: var(--brand-gradient);
   color: #fff;
   font-size: 0.78rem;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
+}
+
+.recognized-keywords-label {
+  margin: 0 0 0.5rem;
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  font-weight: 700;
 }
 
 .ai-add-cart-btn:hover:not(:disabled) {

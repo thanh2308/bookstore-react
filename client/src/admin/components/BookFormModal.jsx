@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useToast } from '../../components/Toast';
+import AppIcon from '../../components/AppIcon';
 import './BookFormModal.css';
 
 const BookFormModal = ({ book, onSave, onClose }) => {
@@ -71,8 +72,8 @@ const BookFormModal = ({ book, onSave, onClose }) => {
         <div className="modal-overlay" onClick={onClose}>
             <div className="book-form-modal" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2>{book ? '✏️ Sửa Sách' : '➕ Thêm Sách Mới'}</h2>
-                    <button className="modal-close" onClick={onClose}>✕</button>
+                    <h2><AppIcon name={book ? 'edit' : 'plus'} size={22} /> {book ? 'Sửa Sách' : 'Thêm Sách Mới'}</h2>
+                    <button className="modal-close" onClick={onClose}><AppIcon name="x" size={18} /></button>
                 </div>
 
                 <form onSubmit={handleSubmit} className="book-form">
@@ -206,7 +207,7 @@ const BookFormModal = ({ book, onSave, onClose }) => {
                                     id="imageUpload"
                                 />
                                 <label htmlFor="imageUpload" className="file-label">
-                                    📁 Chọn ảnh từ máy
+                                    <AppIcon name="upload" size={16} /> Chọn ảnh từ máy
                                 </label>
 
                                 <span className="or-divider">hoặc</span>
@@ -237,7 +238,7 @@ const BookFormModal = ({ book, onSave, onClose }) => {
                                         }}
                                         className="btn-remove-image"
                                     >
-                                        ✕ Xóa
+                                        <AppIcon name="trash" size={16} /> Xóa
                                     </button>
                                 </div>
                             )}

@@ -3,7 +3,8 @@ import { Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { addToCart } from "../redux/cartSlice";
 import { useToast } from "../components/Toast";
-import api, { resolveAssetUrl } from "../services/api";
+import AppIcon from "../components/AppIcon";
+import api, { getOptimizedImageUrl } from "../services/api";
 import "./AiChat.css";
 
 // ─── Quick prompts để inspire user ───────────────
@@ -26,7 +27,7 @@ const parseMarkdown = (text) => {
 // ─── AI Response Message Component ───────────────
 const AIMessage = ({ content, isTyping }) => (
   <div className="message ai">
-    <div className="message-avatar">🤖</div>
+    <div className="message-avatar"><AppIcon name="bot" size={18} /></div>
     <div className="message-bubble">
       {isTyping ? (
         <div className="typing-indicator">
@@ -44,7 +45,7 @@ const AIMessage = ({ content, isTyping }) => (
 // ─── User Message Component ───────────────────────
 const UserMessage = ({ content }) => (
   <div className="message user">
-    <div className="message-avatar">👤</div>
+    <div className="message-avatar"><AppIcon name="user" size={18} /></div>
     <div className="message-bubble">{content}</div>
   </div>
 );
@@ -59,14 +60,14 @@ const AnalysisPanel = ({ analysis }) => {
   return (
     <div className="ai-analysis-panel">
       <div className="panel-header">
-        <span>🔬</span>
+        <AppIcon name="sparkles" size={17} />
         <span>Phân tích TF-IDF Engine</span>
         <span className={`confidence-badge ${analysis.confidence}`}>
           {analysis.confidence === "high"
-            ? "🎯 Cao"
+            ? "Cao"
             : analysis.confidence === "medium"
-              ? "🤔 Trung bình"
-              : "❓ Thấp"}
+              ? "Trung bình"
+              : "Thấp"}
         </span>
       </div>
       <div className="panel-body">
@@ -76,7 +77,7 @@ const AnalysisPanel = ({ analysis }) => {
             <div className="score-row" key={cat.category}>
               <div className="score-label">
                 <span>
-                  {i === 0 ? "🏆" : i === 1 ? "🥈" : "🥉"} {cat.category}
+                  <AppIcon name={i === 0 ? "star" : "chart"} size={14} /> {cat.category}
                 </span>
                 <span className="score-pct">
                   {(cat.score * 100).toFixed(1)}%
@@ -95,15 +96,8 @@ const AnalysisPanel = ({ analysis }) => {
         {/* Tokens */}
         {analysis.inputTokens?.length > 0 && (
           <>
-            <p
-              style={{
-                fontSize: "0.78rem",
-                color: "var(--text-secondary)",
-                marginBottom: "0.5rem",
-                fontWeight: 600,
-              }}
-            >
-              🔤 Từ khóa được nhận diện:
+            <p className="recognized-keywords-label">
+              Từ khóa được nhận diện:
             </p>
             <div className="token-chips">
               {analysis.inputTokens.slice(0, 12).map((token, i) => (
@@ -133,7 +127,7 @@ const BookResults = ({ books, category, onAddToCart }) => {
     <div className="ai-books-section">
       <div className="books-section-header">
         <div className="books-section-title">
-          <span>📚</span>
+          <AppIcon name="book" size={18} />
           <span>Gợi ý cho bạn {category ? `– ${category}` : ""}</span>
         </div>
         <span className="books-count-badge">{books.length} cuốn</span>
@@ -145,17 +139,15 @@ const BookResults = ({ books, category, onAddToCart }) => {
 
           return (
             <div className="ai-book-card" key={bookId}>
-              <Link to={`/book/${bookId}`} className="ai-book-link">
+              <Link to={`/books/${bookId}`} className="ai-book-link">
                 <div className="ai-book-img-wrap">
                   <img
                     src={
-                      book.image?.startsWith("http")
-                        ? book.image
-                        : resolveAssetUrl(book.image)
+                      getOptimizedImageUrl(book.coverImage || book.image, "w_320,f_auto,q_auto")
                     }
                     alt={book.title}
                     onError={(e) => {
-                      e.target.src = `https://placehold.co/200x280/6366f1/white?text=${encodeURIComponent(book.title?.slice(0, 10) || "Book")}`;
+                      e.target.src = `https://placehold.co/200x280/1C1917/white?text=${encodeURIComponent(book.title?.slice(0, 10) || "Book")}`;
                     }}
                   />
                 </div>
@@ -168,7 +160,7 @@ const BookResults = ({ books, category, onAddToCart }) => {
                       {formatPrice(book.price)}
                     </span>
                     <span className="ai-book-rating">
-                      ⭐ {book.rating?.toFixed(1) || "–"}
+                      <AppIcon name="star" size={14} fill="currentColor" /> {book.rating?.toFixed(1) || "–"}
                     </span>
                   </div>
                 </div>
@@ -179,7 +171,7 @@ const BookResults = ({ books, category, onAddToCart }) => {
                 onClick={() => onAddToCart(book)}
                 disabled={isOutOfStock}
               >
-                {isOutOfStock ? "Hết hàng" : "🛒 Thêm vào giỏ"}
+                {isOutOfStock ? "Hết hàng" : <><AppIcon name="cart" size={15} /> Thêm vào giỏ</>}
               </button>
             </div>
           );
@@ -198,7 +190,7 @@ const AiChat = () => {
     {
       type: "ai",
       content:
-        "👋 Xin chào! Tôi là **BookAI** – trợ lý gợi ý sách thông minh của bạn!\n\nHãy mô tả sở thích, tâm trạng hoặc chủ đề bạn muốn đọc – tôi sẽ dùng **TF-IDF** để phân tích và gợi ý sách phù hợp nhất! 📚",
+        "Xin chào! Tôi là **BookStore AI** - trợ lý gợi ý sách của bạn.\n\nHãy mô tả sở thích, tâm trạng hoặc chủ đề bạn muốn đọc, tôi sẽ phân tích và gợi ý sách phù hợp.",
     },
   ]);
   const [input, setInput] = useState("");
@@ -227,9 +219,19 @@ const AiChat = () => {
       setLastBooks(null);
 
       try {
-        const { data } = await api.post("/ai/chat", {
-          message: trimmed,
-        });
+        let response;
+        try {
+          response = await api.post("/chat", {
+            message: trimmed,
+            sessionId: "pageturn-web",
+          });
+        } catch {
+          response = await api.post("/ai/chat", {
+            message: trimmed,
+          });
+        }
+
+        const { data } = response;
 
         if (data.success) {
           // Add AI response
@@ -305,8 +307,8 @@ const AiChat = () => {
     <div className="ai-page">
       {/* ── Hero ── */}
       <div className="ai-hero">
-        <div className="ai-hero-badge">✨ Fake AI Level 4 – TF-IDF Engine</div>
-        <h1>🧠 BookAI Assistant</h1>
+        <div className="ai-hero-badge"><AppIcon name="sparkles" size={15} /> TF-IDF Recommendation Engine</div>
+        <h1><AppIcon name="bot" size={34} /> BookStore AI</h1>
         <p>Mô tả sở thích của bạn – AI sẽ phân tích và gợi ý sách phù hợp!</p>
 
         <div className="ai-quick-prompts">
@@ -330,8 +332,8 @@ const AiChat = () => {
           <div className="chat-messages">
             {messages.length === 0 ? (
               <div className="chat-welcome">
-                <div className="chat-welcome-icon">🤖</div>
-                <h3>BookAI đang chờ bạn!</h3>
+                <div className="chat-welcome-icon"><AppIcon name="bot" size={38} /></div>
+                <h3>BookStore AI đang chờ bạn!</h3>
                 <p>Hãy nhập tin nhắn hoặc chọn gợi ý nhanh bên trên</p>
               </div>
             ) : (
@@ -368,7 +370,7 @@ const AiChat = () => {
               disabled={!input.trim() || isLoading}
               aria-label="Gửi tin nhắn"
             >
-              {isLoading ? "⏳" : "➤"}
+              {isLoading ? <AppIcon name="clock" size={18} /> : <AppIcon name="send" size={18} />}
             </button>
           </div>
         </div>

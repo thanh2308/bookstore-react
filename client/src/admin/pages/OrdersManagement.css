@@ -11,22 +11,22 @@
 
 .filter-btn {
     padding: 0.75rem 1.5rem;
-    border: 2px solid #e5e7eb;
-    background-color: white;
-    border-radius: 0.5rem;
+    border: 1px solid var(--border-color);
+    background-color: var(--card-bg);
+    border-radius: var(--radius-md);
     font-weight: 500;
     cursor: pointer;
     transition: all 0.3s ease;
 }
 
 .filter-btn:hover {
-    border-color: #6366f1;
+    border-color: var(--accent-color);
 }
 
 .filter-btn.active {
-    background-color: #6366f1;
+    background-color: var(--primary-color);
     color: white;
-    border-color: #6366f1;
+    border-color: var(--primary-color);
 }
 
 .orders-list {
@@ -36,33 +36,38 @@
 }
 
 .order-card {
-    background-color: white;
-    border-radius: 1rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--card-shadow);
     overflow: hidden;
 }
 
 .order-header {
+    width: 100%;
+    border: 0;
+    background: transparent;
     display: flex;
     justify-content: space-between;
     padding: 1.5rem;
     cursor: pointer;
+    text-align: left;
     transition: background-color 0.3s ease;
 }
 
 .order-header:hover {
-    background-color: #f9fafb;
+    background-color: var(--bg-primary);
 }
 
 .order-info h3 {
     margin: 0 0 0.5rem 0;
-    color: #1f2937;
+    color: var(--text-primary);
 }
 
 .order-customer,
 .order-date {
     margin: 0.25rem 0;
-    color: #6b7280;
+    color: var(--text-secondary);
     font-size: 0.875rem;
 }
 
@@ -102,7 +107,7 @@
 .order-total {
     font-size: 1.25rem;
     font-weight: 700;
-    color: #6366f1;
+    color: var(--secondary-color);
     margin: 0;
 }
 
@@ -116,13 +121,13 @@
 
 .order-details {
     padding: 1.5rem;
-    background-color: #f9fafb;
-    border-top: 2px solid #e5e7eb;
+    background-color: var(--bg-primary);
+    border-top: 1px solid var(--border-color);
 }
 
 .order-details h4 {
     margin: 0 0 1rem 0;
-    color: #374151;
+    color: var(--text-primary);
 }
 
 .order-items {
@@ -134,8 +139,9 @@
     grid-template-columns: 1fr auto auto;
     gap: 1rem;
     padding: 0.75rem;
-    background-color: white;
-    border-radius: 0.5rem;
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
     margin-bottom: 0.5rem;
 }
 
@@ -145,7 +151,7 @@
 
 .order-address p {
     margin: 0.5rem 0;
-    color: #6b7280;
+    color: var(--text-secondary);
 }
 
 .order-actions {
@@ -156,13 +162,13 @@
 
 .order-actions label {
     font-weight: 600;
-    color: #374151;
+    color: var(--text-primary);
 }
 
 .status-select {
     padding: 0.75rem 1rem;
-    border: 2px solid #e5e7eb;
-    border-radius: 0.5rem;
+    border: 1px solid var(--input-border);
+    border-radius: var(--radius-md);
     font-weight: 500;
     cursor: pointer;
 }
@@ -176,4 +182,8 @@
     .order-summary {
         justify-content: space-between;
     }
+}
+
+.export-btn {
+    margin-left: auto;
 }

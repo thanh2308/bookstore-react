@@ -2,6 +2,8 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchBooks, updateBook } from '../../redux/booksSlice';
 import { useToast } from '../../components/Toast';
+import { getOptimizedImageUrl } from '../../services/api';
+import AppIcon from '../../components/AppIcon';
 import './InventoryManagement.css';
 
 const InventoryManagement = () => {
@@ -11,6 +13,8 @@ const InventoryManagement = () => {
     const loading = useSelector(state => state.books.loading);
     const [searchTerm, setSearchTerm] = useState('');
     const [showLowStockOnly, setShowLowStockOnly] = useState(false);
+    const [editingStockId, setEditingStockId] = useState(null);
+    const [editingStockValue, setEditingStockValue] = useState('');
 
     const LOW_STOCK_THRESHOLD = 5;
 
@@ -45,6 +49,21 @@ const InventoryManagement = () => {
         }
     };
 
+    const handleSaveStock = async (book) => {
+        const nextQuantity = Number(editingStockValue);
+        if (!Number.isFinite(nextQuantity) || nextQuantity < 0) {
+            showError('Số lượng tồn kho không hợp lệ');
+            return;
+        }
+        try {
+            await dispatch(updateBook({ id: book._id || book.id, bookData: { stockQuantity: nextQuantity } })).unwrap();
+            success(`Đã cập nhật tồn kho "${book.title}"`);
+            setEditingStockId(null);
+        } catch (error) {
+            showError(error || 'Không cập nhật được tồn kho');
+        }
+    };
+
     const getStockStatus = (quantity) => {
         if (quantity === 0) return { text: 'Hết hàng', class: 'out-of-stock' };
         if (quantity <= LOW_STOCK_THRESHOLD) return { text: 'Sắp hết', class: 'low-stock' };
@@ -53,13 +72,17 @@ const InventoryManagement = () => {
 
     return (
         <div className="inventory-management">
-            <h1>📦 Quản Lý Kho Hàng</h1>
+            <h1><AppIcon name="package" size={28} /> Quản Lý Kho Hàng</h1>
 
-            {loading && <div className="loading-state"><div className="spinner"></div><p>Đang tải kho hàng...</p></div>}
+            {loading && (
+                <div className="admin-table-skeleton" aria-label="Đang tải kho hàng">
+                    {[1, 2, 3, 4].map((item) => <span className="skeleton admin-row-skeleton" key={item} />)}
+                </div>
+            )}
 
             {lowStockBooks.length > 0 && (
                 <div className="alert-banner warning">
-                    <span className="alert-icon">⚠️</span>
+                    <span className="alert-icon"><AppIcon name="alert" size={24} /></span>
                     <div>
                         <strong>Cảnh báo tồn kho!</strong>
                         <p>{lowStockBooks.length} sản phẩm sắp hết hàng (≤ {LOW_STOCK_THRESHOLD} cuốn)</p>
@@ -90,9 +113,12 @@ const InventoryManagement = () => {
                 <table className="inventory-table">
                     <thead>
                         <tr>
+                            <th>Cover</th>
                             <th>Sách</th>
+                            <th>SKU</th>
                             <th>Thể loại</th>
                             <th>Tồn kho</th>
+                            <th>Ngưỡng cảnh báo</th>
                             <th>Trạng thái</th>
                             <th>Nhập hàng</th>
                         </tr>
@@ -105,20 +131,46 @@ const InventoryManagement = () => {
                             return (
                                 <tr key={book._id || book.id} className={status.class}>
                                     <td>
-                                        <div className="book-info-cell">
-                                            <img src={book.image} alt={book.title} className="book-thumb-small" />
-                                            <div>
-                                                <div className="book-title-small">{book.title}</div>
-                                                <div className="book-author-small">{book.author}</div>
-                                            </div>
+                                        <img src={getOptimizedImageUrl(book.coverImage || book.image, "w_120,f_auto,q_auto")} alt={book.title} className="book-thumb-small" />
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <div className="book-title-small">{book.title}</div>
+                                            <div className="book-author-small">{book.author}</div>
                                         </div>
                                     </td>
+                                    <td>{book.isbn || book._id?.slice(-8) || 'N/A'}</td>
                                     <td>
                                         <span className="category-badge">{book.category}</span>
                                     </td>
                                     <td>
-                                        <span className="stock-quantity">{stockQuantity}</span>
+                                        {editingStockId === (book._id || book.id) ? (
+                                            <input
+                                                className="stock-inline-input"
+                                                type="number"
+                                                min="0"
+                                                value={editingStockValue}
+                                                onChange={(event) => setEditingStockValue(event.target.value)}
+                                                onKeyDown={(event) => {
+                                                    if (event.key === 'Enter') handleSaveStock(book);
+                                                    if (event.key === 'Escape') setEditingStockId(null);
+                                                }}
+                                                autoFocus
+                                            />
+                                        ) : (
+                                            <button
+                                                type="button"
+                                                className="stock-quantity"
+                                                onClick={() => {
+                                                    setEditingStockId(book._id || book.id);
+                                                    setEditingStockValue(String(stockQuantity));
+                                                }}
+                                            >
+                                                {stockQuantity}
+                                            </button>
+                                        )}
                                     </td>
+                                    <td>{LOW_STOCK_THRESHOLD} cuốn</td>
                                     <td>
                                         <span className={`status-badge ${status.class}`}>
                                             {status.text}

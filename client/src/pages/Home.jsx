@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { Link, useSearchParams } from "react-router-dom";
 import {
   setSearchQuery,
   setCategory,
@@ -9,20 +10,20 @@ import {
 } from "../redux/booksSlice";
 import BookCard, { BookCardSkeleton } from "../components/BookCard";
 import Pagination from "../components/Pagination";
+import AppIcon from "../components/AppIcon";
 import "./Home.css";
 
 const categories = [
-  "Tất cả",
-  "Kỹ năng sống",
-  "Tiểu thuyết",
-  "Khoa học",
-  "Kinh tế",
-  "Văn học Việt Nam",
-  "Thiếu nhi",
+  { name: "Văn học", apiName: "Văn học Việt Nam", icon: "book" },
+  { name: "Kinh doanh", apiName: "Kinh tế", icon: "chart" },
+  { name: "Khoa học", apiName: "Khoa học", icon: "sparkles" },
+  { name: "Thiếu nhi", apiName: "Thiếu nhi", icon: "gift" },
+  { name: "Tâm lý", apiName: "Kỹ năng sống", icon: "heart" },
 ];
 
 const Home = () => {
   const dispatch = useDispatch();
+  const [searchParams] = useSearchParams();
   const {
     filteredBooks,
     searchQuery,
@@ -36,6 +37,16 @@ const Home = () => {
   } = useSelector((state) => state.books);
 
   const [searchInput, setSearchInput] = useState(searchQuery);
+  const activePromotion = useSelector((state) =>
+    state.promotions.promotions?.find((promotion) => promotion.isActive),
+  );
+
+  useEffect(() => {
+    const query = searchParams.get("search") || "";
+    setSearchInput(query);
+    dispatch(setSearchQuery(query));
+  }, [dispatch, searchParams]);
+
   // Fetch books on mount and when filters change
   useEffect(() => {
     const filters = {
@@ -78,10 +89,25 @@ const Home = () => {
       <section className="hero-section">
         <div className="container">
           <div className="hero-content">
-            <h1 className="hero-title">📚 Chào Mừng Đến BookStore</h1>
-            <p className="hero-subtitle">
-              Khám phá thế giới tri thức cùng hàng ngàn đầu sách chất lượng
-            </p>
+            <div className="hero-copy">
+              <span className="hero-kicker">Nhà sách tuyển chọn</span>
+              <h1 className="hero-title">BookStore dành cho những buổi đọc chậm.</h1>
+              <p className="hero-subtitle">
+                Tủ sách cao cấp, ấm áp và được chọn lọc cho độc giả muốn tìm đúng cuốn sách tiếp theo.
+              </p>
+              <div className="hero-actions">
+                <a className="btn btn-primary" href="#featured-books">Khám phá ngay</a>
+                <a className="btn btn-secondary" href="#featured-books">Xem bestseller</a>
+              </div>
+            </div>
+
+            <div className="hero-book" aria-hidden="true">
+              <div className="hero-book-cover">
+                <span>BookStore</span>
+                <strong>The Quiet Shelf</strong>
+                <em>Selected essays</em>
+              </div>
+            </div>
 
             <div className="search-container">
               <input
@@ -91,7 +117,7 @@ const Home = () => {
                 onChange={(e) => setSearchInput(e.target.value)}
                 className="search-input"
               />
-              <span className="search-icon">🔍</span>
+              <span className="search-icon"><AppIcon name="search" size={22} /></span>
             </div>
           </div>
         </div>
@@ -100,25 +126,49 @@ const Home = () => {
       {/* Category Filter */}
       <section className="category-section">
         <div className="container">
+          <div className="section-heading">
+            <span>Danh mục nổi bật</span>
+            <h2>Chọn kệ sách hợp với hôm nay</h2>
+          </div>
           <div className="category-tabs">
+            <button
+              onClick={() => handleCategoryChange("Tất cả")}
+              className={`category-tab ${selectedCategory === "Tất cả" ? "active" : ""}`}
+            >
+              <AppIcon name="book" size={18} />
+              Tất cả
+            </button>
             {categories.map((category) => (
               <button
-                key={category}
-                onClick={() => handleCategoryChange(category)}
-                className={`category-tab ${selectedCategory === category ? "active" : ""}`}
+                key={category.name}
+                onClick={() => handleCategoryChange(category.apiName)}
+                className={`category-tab ${selectedCategory === category.apiName ? "active" : ""}`}
               >
-                {category}
+                <AppIcon name={category.icon} size={18} />
+                {category.name}
               </button>
             ))}
           </div>
         </div>
       </section>
 
+      {activePromotion && (
+        <section className="promotion-strip">
+          <div className="container promotion-strip-inner">
+            <span><AppIcon name="gift" size={18} /> {activePromotion.name}</span>
+            <strong>Giảm {Math.round((activePromotion.discountRate || 0) * 100)}%</strong>
+          </div>
+        </section>
+      )}
+
       {/* Books Grid */}
-      <section className="books-section">
+      <section className="books-section" id="featured-books">
         <div className="container">
           <div className="books-header-row">
-            <h2>Danh Sách Sách ({filteredBooks.length})</h2>
+            <div>
+              <span className="section-eyebrow">Nổi bật tuần này</span>
+              <h2>Những tựa sách đang được quan tâm ({filteredBooks.length})</h2>
+            </div>
 
             <div className="sort-controls">
               <label>Sắp xếp:</label>
@@ -144,7 +194,7 @@ const Home = () => {
             </div>
           ) : error ? (
             <div className="error-state">
-              <p>❌ {error}</p>
+              <p><AppIcon name="alert" size={18} /> {error}</p>
               <button
                 onClick={() => dispatch(fetchBooks({}))}
                 className="btn btn-primary"
@@ -160,7 +210,7 @@ const Home = () => {
             </div>
           ) : (
             <div className="no-books">
-              <p>📚 Không tìm thấy sách nào</p>
+              <p><AppIcon name="book" size={22} /> Không tìm thấy sách nào</p>
             </div>
           )}
 
@@ -176,6 +226,10 @@ const Home = () => {
           )}
         </div>
       </section>
+
+      <Link to="/ai" className="floating-chat-button" aria-label="Mở BookStore AI">
+        <AppIcon name="bot" size={22} />
+      </Link>
     </div>
   );
 };

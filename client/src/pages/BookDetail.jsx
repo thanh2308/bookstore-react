@@ -6,6 +6,7 @@ import { addToCart } from "../redux/cartSlice";
 import { toggleWishlistItem } from "../redux/wishlistSlice";
 import { useToast } from "../components/Toast";
 import BookCard from "../components/BookCard";
+import AppIcon from "../components/AppIcon";
 import { getDisplayRating, getReviewCount } from "../utils/bookReviewUtils";
 import "./BookDetail.css";
 
@@ -111,7 +112,7 @@ const BookDetail = () => {
     return (
       <div className="container">
         <div className="error-state">
-          <p>❌ {error || "Không tìm thấy sách"}</p>
+          <p><AppIcon name="alert" size={18} /> {error || "Không tìm thấy sách"}</p>
           <button onClick={() => navigate("/")} className="btn btn-primary">
             Về trang chủ
           </button>
@@ -153,7 +154,7 @@ const BookDetail = () => {
               onClick={handleToggleWishlist}
               className={`wishlist-btn ${isInWishlist ? "active" : ""}`}
             >
-              {isInWishlist ? "❤️" : "🤍"}
+              <AppIcon name="heart" size={20} fill={isInWishlist ? "currentColor" : "none"} />
             </button>
           </div>
 
@@ -166,7 +167,7 @@ const BookDetail = () => {
 
             <div className="book-rating-section">
               <span className="rating-stars">
-                ⭐ {getDisplayRating(book, { source: "array" })}
+                <AppIcon name="star" size={16} fill="currentColor" /> {getDisplayRating(book, { source: "array" })}
               </span>
               <span className="rating-reviews">
                 ({visibleReviewCount} đánh giá)
@@ -198,7 +199,7 @@ const BookDetail = () => {
                 <span
                   className={`meta-value ${book.inStock ? "in-stock" : "out-of-stock"}`}
                 >
-                  {book.inStock ? "✓ Còn hàng" : "✗ Hết hàng"}
+                  {book.inStock ? "Còn hàng" : "Hết hàng"}
                 </span>
               </div>
             </div>
@@ -210,7 +211,9 @@ const BookDetail = () => {
                     <label>Số lượng:</label>
                     <div className="quantity-input-group">
                       <button
+                        type="button"
                         onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                        className="qty-btn"
                       >
                         −
                       </button>
@@ -223,8 +226,13 @@ const BookDetail = () => {
                           )
                         }
                         min="1"
+                        className="qty-input"
                       />
-                      <button onClick={() => setQuantity(quantity + 1)}>
+                      <button
+                        type="button"
+                        onClick={() => setQuantity(quantity + 1)}
+                        className="qty-btn"
+                      >
                         +
                       </button>
                     </div>
@@ -234,12 +242,12 @@ const BookDetail = () => {
                     onClick={handleAddToCart}
                     className="btn btn-primary btn-large"
                   >
-                    🛒 Thêm vào giỏ hàng
+                  <AppIcon name="cart" size={18} /> Thêm vào giỏ hàng
                   </button>
                 </>
               ) : (
                 <button className="btn btn-secondary btn-large" disabled>
-                  ✗ Hết hàng
+                  Hết hàng
                 </button>
               )}
             </div>
@@ -277,21 +285,20 @@ const BookDetail = () => {
                     <form onSubmit={handleReviewSubmit}>
                       <div className="form-group">
                         <label>Đánh giá:</label>
-                        <select
-                          value={reviewForm.rating}
-                          onChange={(e) =>
-                            setReviewForm({
-                              ...reviewForm,
-                              rating: parseInt(e.target.value),
-                            })
-                          }
-                        >
-                          <option value="5">⭐⭐⭐⭐⭐ Tuyệt vời</option>
-                          <option value="4">⭐⭐⭐⭐ Tốt</option>
-                          <option value="3">⭐⭐⭐ Trung bình</option>
-                          <option value="2">⭐⭐ Kém</option>
-                          <option value="1">⭐ Rất kém</option>
-                        </select>
+                        <div className="star-rating">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <button
+                              key={star}
+                              type="button"
+                              className={star <= reviewForm.rating ? "star active" : "star"}
+                              onClick={() =>
+                                setReviewForm({ ...reviewForm, rating: star })
+                              }
+                            >
+                              ★
+                            </button>
+                          ))}
+                        </div>
                       </div>
                       <div className="form-group">
                         <label>Nhận xét:</label>
@@ -334,7 +341,9 @@ const BookDetail = () => {
                             {review.name || "Anonymous"}
                           </span>
                           <span className="review-rating">
-                            {"⭐".repeat(review.rating)}
+                            {Array.from({ length: review.rating }).map((_, starIndex) => (
+                              <AppIcon key={starIndex} name="star" size={14} fill="currentColor" />
+                            ))}
                           </span>
                         </div>
                         <p className="review-comment">{review.comment}</p>

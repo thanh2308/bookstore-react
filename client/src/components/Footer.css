@@ -1,8 +1,12 @@
 .footer {
-  background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+  background: linear-gradient(135deg, #173f36 0%, #101f1a 100%);
   color: white;
   padding: 2.5rem 0 1rem;
   margin-top: 4rem;
+}
+
+[data-theme="dark"] .footer {
+  background: linear-gradient(135deg, #0f2d26 0%, #0a1814 100%);
 }
 
 .footer-content {
@@ -14,8 +18,15 @@
 
 .footer-section h3,
 .footer-section h4 {
-  font-family: "Playfair Display", serif;
+  font-family: inherit;
   margin-bottom: 1rem;
+}
+
+.footer-section h3,
+.footer-contact li {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
 }
 
 .footer-section h4 {

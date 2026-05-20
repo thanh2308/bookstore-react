@@ -4,6 +4,7 @@ import { chat, analyzeOnly } from "../controllers/aiController.js";
 const router = express.Router();
 
 // POST /api/ai/chat  – Main chatbot endpoint
+router.post("/", chat);
 router.post("/chat", chat);
 
 // POST /api/ai/analyze – Debug/inspect AI analysis

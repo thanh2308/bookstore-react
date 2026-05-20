@@ -1,8 +1,10 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchOrderById, cancelOrder } from '../redux/ordersSlice';
 import { useToast } from '../components/Toast';
+import { getOptimizedImageUrl } from '../services/api';
+import AppIcon from '../components/AppIcon';
 import './OrderDetail.css';
 
 const OrderDetail = () => {
@@ -10,6 +12,7 @@ const OrderDetail = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const { success } = useToast();
+    const [showCancelConfirm, setShowCancelConfirm] = useState(false);
 
     const { currentOrder: order, loading, error } = useSelector(state => state.orders);
     const { isAuthenticated } = useSelector(state => state.auth);
@@ -23,8 +26,6 @@ const OrderDetail = () => {
     }, [id, dispatch, isAuthenticated, navigate]);
 
     const handleCancelOrder = async () => {
-        if (!window.confirm('Bạn có chắc muốn hủy đơn hàng này?')) return;
-
         const result = await dispatch(cancelOrder({
             id,
             reason: 'Khách hàng yêu cầu hủy'
@@ -32,6 +33,7 @@ const OrderDetail = () => {
 
         if (cancelOrder.fulfilled.match(result)) {
             success('Đơn hàng đã được hủy');
+            setShowCancelConfirm(false);
         }
     };
 
@@ -64,9 +66,11 @@ const OrderDetail = () => {
     if (loading) {
         return (
             <div className="container">
-                <div className="loading-state">
-                    <div className="spinner"></div>
-                    <p>Đang tải chi tiết đơn hàng...</p>
+                <div className="order-detail-skeleton" aria-label="Đang tải chi tiết đơn hàng">
+                    <span className="skeleton detail-skeleton-title" />
+                    <span className="skeleton detail-skeleton-line" />
+                    <span className="skeleton detail-skeleton-line short" />
+                    <span className="skeleton detail-skeleton-block" />
                 </div>
             </div>
         );
@@ -76,7 +80,7 @@ const OrderDetail = () => {
         return (
             <div className="container">
                 <div className="error-state">
-                    <p>❌ {error || 'Không tìm thấy đơn hàng'}</p>
+                    <p><AppIcon name="alert" size={18} /> {error || 'Không tìm thấy đơn hàng'}</p>
                     <button onClick={() => navigate('/my-orders')} className="btn btn-primary">
                         Về danh sách đơn hàng
                     </button>
@@ -90,7 +94,7 @@ const OrderDetail = () => {
         return (
             <div className="container">
                 <div className="error-state">
-                    <p>❌ Dữ liệu đơn hàng không hợp lệ</p>
+                    <p><AppIcon name="alert" size={18} /> Dữ liệu đơn hàng không hợp lệ</p>
                     <button onClick={() => navigate('/my-orders')} className="btn btn-primary">
                         Về danh sách đơn hàng
                     </button>
@@ -150,7 +154,7 @@ const OrderDetail = () => {
                             {order.items && order.items.length > 0 ? (
                                 order.items.map((item, index) => (
                                     <div key={index} className="order-item-detail">
-                                        <img src={item.image || '/placeholder-book.jpg'} alt={item.title} />
+                                        <img src={getOptimizedImageUrl(item.coverImage || item.image, "w_260,f_auto,q_auto") || '/placeholder-book.jpg'} alt={item.title} />
                                         <div className="item-info">
                                             <h3>{item.title}</h3>
                                             <p className="item-meta">Số lượng: {item.quantity}</p>
@@ -209,7 +213,7 @@ const OrderDetail = () => {
                             <div className="payment-method-info">
                                 <p>Phương thức: <strong>{order.paymentMethod === 'COD' ? 'Thanh toán khi nhận hàng' : (order.paymentMethod || 'COD')}</strong></p>
                                 <p>Trạng thái thanh toán: <span className={order.isPaid ? 'paid' : 'unpaid'}>
-                                    {order.isPaid ? '✅ Đã thanh toán' : '⏳ Chưa thanh toán'}
+                                    {order.isPaid ? <><AppIcon name="checkCircle" size={15} /> Đã thanh toán</> : <><AppIcon name="clock" size={15} /> Chưa thanh toán</>}
                                 </span></p>
                             </div>
                         </div>
@@ -218,13 +222,30 @@ const OrderDetail = () => {
                     {/* Actions */}
                     {canCancel && (
                         <div className="order-actions">
-                            <button onClick={handleCancelOrder} className="btn btn-danger">
+                            <button onClick={() => setShowCancelConfirm(true)} className="btn btn-danger">
                                 Hủy đơn hàng
                             </button>
                         </div>
                     )}
                 </div>
             </div>
+
+            {showCancelConfirm && (
+                <div className="confirm-overlay" role="dialog" aria-modal="true" aria-labelledby="cancel-order-title">
+                    <div className="confirm-modal">
+                        <h2 id="cancel-order-title">Hủy đơn hàng?</h2>
+                        <p>Đơn hàng sẽ được chuyển sang trạng thái đã hủy và không thể tiếp tục xử lý.</p>
+                        <div className="confirm-actions">
+                            <button type="button" className="btn btn-secondary" onClick={() => setShowCancelConfirm(false)}>
+                                Giữ đơn
+                            </button>
+                            <button type="button" className="btn btn-danger" onClick={handleCancelOrder}>
+                                Xác nhận hủy
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

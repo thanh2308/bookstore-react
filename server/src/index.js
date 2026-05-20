@@ -74,6 +74,7 @@ app.use("/api/promotions", promotionRoutes);
 app.use("/api/analytics", analyticsRoutes);
 app.use("/api/payment", paymentRoutes);
 app.use("/api/ai", aiRoutes);
+app.use("/api/chat", aiRoutes);
 
 // Health check route
 app.get("/health", (req, res) => {

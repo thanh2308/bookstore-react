@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { fetchMyOrders } from '../redux/ordersSlice';
+import { getOptimizedImageUrl } from '../services/api';
+import AppIcon from '../components/AppIcon';
 import './MyOrders.css';
 
 const statusOptions = [
@@ -68,9 +70,14 @@ const MyOrders = () => {
     if (loading) {
         return (
             <div className="container">
-                <div className="loading-state">
-                    <div className="spinner"></div>
-                    <p>Đang tải đơn hàng...</p>
+                <div className="orders-skeleton-list" aria-label="Đang tải đơn hàng">
+                    {[1, 2, 3].map((item) => (
+                        <div className="order-skeleton-card" key={item}>
+                            <span className="skeleton order-skeleton-title" />
+                            <span className="skeleton order-skeleton-line" />
+                            <span className="skeleton order-skeleton-line short" />
+                        </div>
+                    ))}
                 </div>
             </div>
         );
@@ -80,7 +87,7 @@ const MyOrders = () => {
         return (
             <div className="container">
                 <div className="error-state">
-                    <p>❌ {error}</p>
+                    <p><AppIcon name="alert" size={18} /> {error}</p>
                     <button onClick={() => dispatch(fetchMyOrders())} className="btn btn-primary">
                         Thử lại
                     </button>
@@ -110,7 +117,7 @@ const MyOrders = () => {
 
                 {!hasOrders ? (
                     <div className="empty-orders">
-                        <div className="empty-icon">📦</div>
+                        <div className="empty-icon"><AppIcon name="package" size={44} /></div>
                         <h2>Chưa có đơn hàng nào</h2>
                         <p>Bạn chưa đặt đơn hàng nào. Hãy khám phá và mua sắm ngay!</p>
                         <button onClick={() => navigate('/')} className="btn btn-primary">
@@ -119,7 +126,7 @@ const MyOrders = () => {
                     </div>
                 ) : filteredOrders.length === 0 ? (
                     <div className="empty-orders">
-                        <div className="empty-icon">📦</div>
+                        <div className="empty-icon"><AppIcon name="package" size={44} /></div>
                         <h2>Không có đơn hàng với trạng thái này</h2>
                         <p>Hãy chọn lại trạng thái khác để xem đơn hàng.</p>
                         <button onClick={() => setStatusFilter('all')} className="btn btn-primary">
@@ -146,7 +153,7 @@ const MyOrders = () => {
                                     {order.items.map((item, index) => (
                                         <div key={index} className="order-item">
                                             <img
-                                                src={item.image || '/placeholder-book.jpg'}
+                                                src={getOptimizedImageUrl(item.coverImage || item.image, "w_260,f_auto,q_auto") || '/placeholder-book.jpg'}
                                                 alt={item.title}
                                                 className="item-image"
                                             />
