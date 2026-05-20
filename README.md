@@ -1,6 +1,6 @@
 # Web Bán Sách (Bookstore E-commerce)
 
-Ứng dụng thương mại điện tử bán sách trực tuyến với  đầy đủ tính năng quản lý sách, đơn hàng, và người dùng.
+Ứng dụng thương mại điện tử bán sách trực tuyến với đầy đủ tính năng quản lý sách, đơn hàng, và người dùng.
 
 ## 🚀 Tech Stack
 
@@ -13,6 +13,7 @@
 ## 📦 Features
 
 ### Customer Features
+
 - 🔐 Đăng ký / Đăng nhập
 - 📚 Duyệt sách với filter & search
 - 🛒 Giỏ hàng
@@ -22,6 +23,7 @@
 - 👤 Quản lý profile
 
 ### Admin Features
+
 - 📖 Quản lý sách (CRUD)
 - 📦 Quản lý đơn hàng
 - 👥 Quản lý người dùng
@@ -32,6 +34,7 @@
 ## 🛠️ Installation
 
 ### Prerequisites
+
 - Node.js >= 16
 - MongoDB >= 5.0
 - npm hoặc yarn
@@ -39,18 +42,21 @@
 ### Quick Start (Recommended)
 
 **Windows:**
+
 ```bash
 # Double-click hoặc chạy:
 start-dev.bat
 ```
 
 **macOS/Linux:**
+
 ```bash
 chmod +x start-dev.sh
 ./start-dev.sh
 ```
 
 Script sẽ tự động:
+
 - ✅ Kiểm tra và khởi động MongoDB
 - ✅ Install dependencies (nếu cần)
 - ✅ Tạo .env files
@@ -95,6 +101,7 @@ npm run dev
 ## 🔧 Environment Variables
 
 ### Backend (.env)
+
 ```env
 PORT=5000
 MONGODB_URI=mongodb://localhost:27017/bookstore
@@ -108,6 +115,7 @@ FRONTEND_URL=http://localhost:5173
 ```
 
 ### Frontend (.env)
+
 ```env
 VITE_API_URL=http://localhost:5000/api
 ```
@@ -115,12 +123,14 @@ VITE_API_URL=http://localhost:5000/api
 ## 📖 API Documentation
 
 ### Authentication
+
 - `POST /api/auth/register` - Register new user
 - `POST /api/auth/login` - Login user
 - `GET /api/auth/me` - Get current user (Protected)
 - `PUT /api/auth/profile` - Update profile (Protected)
 
 ### Books
+
 - `GET /api/books` - Get all books (with filters)
 - `GET /api/books/:id` - Get single book
 - `POST /api/books` - Create book (Admin)
@@ -129,6 +139,7 @@ VITE_API_URL=http://localhost:5000/api
 - `POST /api/books/:id/reviews` - Add review (Protected)
 
 ### Orders
+
 - `POST /api/orders` - Create order (Protected)
 - `GET /api/orders/myorders` - Get my orders (Protected)
 - `GET /api/orders/:id` - Get order by ID (Protected)
@@ -137,6 +148,7 @@ VITE_API_URL=http://localhost:5000/api
 - `PUT /api/orders/:id/status` - Update order status (Admin)
 
 ### Users
+
 - `GET /api/users` - Get all users (Admin)
 - `GET /api/users/:id` - Get user by ID (Admin)
 - `PUT /api/users/:id` - Update user (Admin)
@@ -146,6 +158,7 @@ VITE_API_URL=http://localhost:5000/api
 - `POST /api/users/wishlist/:bookId` - Toggle wishlist (Protected)
 
 ### Promotions
+
 - `GET /api/promotions` - Get promotions
 - `POST /api/promotions/validate` - Validate promo code (Protected)
 - `POST /api/promotions` - Create promotion (Admin)
@@ -155,6 +168,7 @@ VITE_API_URL=http://localhost:5000/api
 ## 🧪 Testing
 
 ### Test Admin Account
+
 Email: `admin@example.com`  
 Password: `your_password`
 
@@ -204,7 +218,86 @@ d:\Web_Ban_Sach/
 
 ## 🚦 Deployment
 
-### Backend (Heroku example)
+### Tổng quan
+
+Project frontend đang chạy ở `http://localhost:5173`, đây là port mặc định của **Vite + React**.
+Vì vậy, frontend của dự án có thể deploy rất phù hợp trên Vercel.
+
+Flow triển khai:
+
+```text
+Code -> GitHub -> Vercel -> Website online
+```
+
+### Bước 1: Đưa code lên GitHub
+
+Nếu chưa có repo GitHub:
+
+```bash
+git init
+git add .
+git commit -m "first commit"
+git branch -M main
+git remote add origin https://github.com/your-username/your-repo.git
+git push -u origin main
+```
+
+### Bước 2: Deploy Frontend (Vite React) lên Vercel
+
+#### Cách 1: Vercel UI (nhanh nhất)
+
+1. Truy cập https://vercel.com và đăng nhập bằng GitHub.
+2. Chọn **New Project**.
+3. Import repository của bạn.
+4. Chọn **Root Directory** là `client` (quan trọng vì frontend nằm trong thư mục `client`).
+5. Vercel sẽ tự detect framework (Vite).
+6. Kiểm tra cấu hình:
+
+- Framework: `Vite`
+- Build Command: `npm run build`
+- Output Directory: `dist`
+
+7. Thêm Environment Variables (Production):
+
+- `VITE_API_URL` = URL backend online (ví dụ: `https://your-backend-domain.com/api`)
+- `VITE_PAYMENT_RETURN_URL` = URL frontend online + `/payment-result`
+
+8. Chọn **Deploy**.
+
+#### Cách 2: Vercel CLI
+
+```bash
+npm i -g vercel
+vercel login
+```
+
+Trong thư mục frontend (nơi có file `client/package.json`):
+
+```bash
+cd client
+vercel
+```
+
+Các câu hỏi thường gặp khi chạy CLI:
+
+- Link to existing project? -> chọn theo nhu cầu (thường là `N` nếu tạo mới)
+- Framework -> `Vite` (hoặc để auto detect)
+- Output folder -> `dist`
+
+Deploy production ngay:
+
+```bash
+vercel --prod
+```
+
+Gợi ý: khi CLI hỏi scope/project, giữ mặc định nếu bạn chỉ deploy cá nhân.
+
+### Backend (deploy riêng)
+
+Vercel phù hợp nhất cho frontend tĩnh hoặc serverless. Với backend Node.js/Express của dự án, nên deploy riêng (Render/Railway/Heroku/VPS), sau đó cấu hình lại `VITE_API_URL` trỏ tới URL backend online.
+
+Ví dụ backend (Heroku):
+
 ```bash
 cd server
 heroku create bookstore-api
@@ -213,11 +306,39 @@ heroku config:set JWT_SECRET=your_secret
 git push heroku main
 ```
 
-### Frontend (Vercel example)
+### Frontend environment sau khi backend online
+
+Trong `client/.env`:
+
 ```bash
-vercel --prod
-# Set VITE_API_URL to your backend URL
+VITE_API_URL=https://your-backend-domain.com/api
+VITE_PAYMENT_RETURN_URL=https://your-project.vercel.app/payment-result
 ```
+
+Ngoài ra có thể tham khảo file mẫu `client/.env.production.example`.
+
+### Lỗi thường gặp khi deploy Vercel
+
+1. Trắng trang sau deploy
+
+- Kiểm tra build local:
+
+```bash
+cd client
+npm run build
+```
+
+2. Sai output directory
+
+- Bắt buộc để `dist` (đối với Vite).
+
+3. Frontend gọi API lỗi
+
+- Do backend chưa deploy hoặc `VITE_API_URL` chưa đúng domain online.
+
+## 📘 Hướng dẫn nộp bài full
+
+Xem file `DEPLOY_VERCEL_FULL.md` để có bản hướng dẫn đầy đủ theo format báo cáo/nộp bài (mục tiêu, bước làm, lệnh CLI, checklist ảnh chụp, kết quả mong đợi).
 
 ## 📝 License
 

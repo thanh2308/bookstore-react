@@ -107,6 +107,9 @@ bookSchema.methods.calculateRating = function () {
     }
 };
 
+bookSchema.index({ title: 'text', author: 'text' });
+bookSchema.index({ category: 1 });
+bookSchema.index({ price: 1 });
+bookSchema.index({ rating: -1 });
 const Book = mongoose.model('Book', bookSchema);
-
 export default Book;
