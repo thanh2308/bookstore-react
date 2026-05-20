@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import AppIcon from './AppIcon';
 import './NotificationBanner.css';
 
 const NotificationBanner = () => {
@@ -24,12 +25,12 @@ const NotificationBanner = () => {
     return (
         <div className={`notification-banner ${isVisible ? 'show' : ''}`}>
             <div className="banner-content">
-                <span className="banner-icon">🎉</span>
+                <span className="banner-icon"><AppIcon name="gift" size={22} /></span>
                 <div className="banner-text">
                     <strong>Khuyến mãi đặc biệt!</strong> Giảm 20% cho tất cả sách kỹ năng sống.
                     Áp dụng từ hôm nay đến hết tháng!
                 </div>
-                <button onClick={handleDismiss} className="banner-close">✕</button>
+                <button onClick={handleDismiss} className="banner-close"><AppIcon name="x" size={18} /></button>
             </div>
         </div>
     );

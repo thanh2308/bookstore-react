@@ -13,29 +13,32 @@
     margin: 0;
 }
 
+.admin-toolbar,
 .search-bar {
     display: flex;
     gap: 1rem;
     align-items: center;
     margin-bottom: 2rem;
+    flex-wrap: wrap;
 }
 
 .search-input-admin {
     flex: 1;
     padding: 0.75rem 1rem;
-    border: 2px solid #e5e7eb;
-    border-radius: 0.5rem;
+    border: 1px solid var(--input-border);
+    border-radius: var(--radius-md);
     font-size: 1rem;
 }
 
 .search-count {
-    color: #6b7280;
+    color: var(--text-secondary);
     font-weight: 500;
 }
 
 .books-table-container {
-    background-color: white;
-    border-radius: 1rem;
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
     overflow: hidden;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
@@ -46,24 +49,24 @@
 }
 
 .books-table thead {
-    background-color: #f9fafb;
+    background-color: var(--bg-primary);
 }
 
 .books-table th {
     padding: 1rem;
     text-align: left;
     font-weight: 600;
-    color: #374151;
-    border-bottom: 2px solid #e5e7eb;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-color);
 }
 
 .books-table td {
     padding: 1rem;
-    border-bottom: 1px solid #f3f4f6;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .books-table tbody tr:hover {
-    background-color: #f9fafb;
+    background-color: var(--bg-primary);
 }
 
 .book-thumb {
@@ -75,12 +78,12 @@
 
 .book-title-cell {
     font-weight: 600;
-    color: #1f2937;
+    color: var(--text-primary);
 }
 
 .category-badge {
-    background-color: #e0e7ff;
-    color: #4f46e5;
+    background-color: #fff7ed;
+    color: var(--accent-color);
     padding: 0.25rem 0.75rem;
     border-radius: 9999px;
     font-size: 0.875rem;
@@ -89,7 +92,7 @@
 
 .price-cell {
     font-weight: 700;
-    color: #6366f1;
+    color: var(--secondary-color);
 }
 
 .rating-badge {
@@ -134,6 +137,7 @@
 
 .btn-edit {
     background-color: #dbeafe;
+    color: #1d4ed8;
 }
 
 .btn-edit:hover {
@@ -142,6 +146,7 @@
 
 .btn-delete {
     background-color: #fee2e2;
+    color: #b91c1c;
 }
 
 .btn-delete:hover {
@@ -157,4 +162,56 @@
     .books-table td {
         padding: 0.75rem 0.5rem;
     }
+}
+
+.bulk-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.45rem;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+}
+
+.admin-table-skeleton {
+    display: grid;
+    gap: 0.7rem;
+}
+
+.admin-row-skeleton {
+    height: 64px;
+    border-radius: var(--radius-md);
+}
+
+.admin-confirm-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1300;
+    display: grid;
+    place-items: center;
+    padding: 1rem;
+    background: rgba(28, 25, 23, 0.48);
+    backdrop-filter: blur(8px);
+}
+
+.admin-confirm-modal {
+    width: min(420px, 100%);
+    padding: 1.5rem;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+}
+
+.admin-confirm-modal h2,
+.admin-confirm-modal p {
+    margin-top: 0;
+}
+
+.admin-confirm-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 1.25rem;
 }

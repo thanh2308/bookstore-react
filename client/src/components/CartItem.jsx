@@ -5,6 +5,7 @@ import {
   decreaseQuantity,
   removeFromCart,
 } from "../redux/cartSlice";
+import AppIcon from "./AppIcon";
 import "./CartItem.css";
 
 const CartItem = ({ item }) => {
@@ -69,7 +70,7 @@ const CartItem = ({ item }) => {
           onClick={() => dispatch(removeFromCart(itemId))}
           className="remove-btn"
         >
-          🗑️ Xóa
+          <AppIcon name="trash" size={16} /> Xóa
         </button>
       </div>
     </div>

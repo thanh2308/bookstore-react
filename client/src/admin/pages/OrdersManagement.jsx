@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchAllOrders, updateOrderStatus } from '../../redux/ordersSlice';
 import { useToast } from '../../components/Toast';
+import AppIcon from '../../components/AppIcon';
 import './OrdersManagement.css';
 
 const OrdersManagement = () => {
@@ -73,9 +74,8 @@ const OrdersManagement = () => {
     if (loading) {
         return (
             <div className="orders-management">
-                <div className="loading-state">
-                    <div className="spinner"></div>
-                    <p>Đang tải đơn hàng...</p>
+                <div className="admin-table-skeleton" aria-label="Đang tải đơn hàng">
+                    {[1, 2, 3, 4].map((item) => <span className="skeleton admin-row-skeleton" key={item} />)}
                 </div>
             </div>
         );
@@ -83,7 +83,7 @@ const OrdersManagement = () => {
 
     return (
         <div className="orders-management">
-            <h1>📦 Quản Lý Đơn Hàng</h1>
+            <h1><AppIcon name="package" size={28} /> Quản Lý Đơn Hàng</h1>
 
             <div className="orders-filters">
                 <button
@@ -116,8 +116,8 @@ const OrdersManagement = () => {
                 >
                     Đã giao ({allOrders.filter(o => o.status === 'delivered').length})
                 </button>
-                <button onClick={exportCsv} className="filter-btn">
-                    Export CSV
+                <button onClick={exportCsv} className="filter-btn export-btn">
+                    <AppIcon name="upload" size={15} /> Xuất CSV
                 </button>
             </div>
 
@@ -125,14 +125,14 @@ const OrdersManagement = () => {
                 {filteredOrders.length > 0 ? (
                     filteredOrders.map((order) => (
                         <div key={order._id} className="order-card">
-                            <div className="order-header" onClick={() => setExpandedOrder(expandedOrder === order._id ? null : order._id)}>
+                            <button type="button" className="order-header" onClick={() => setExpandedOrder(expandedOrder === order._id ? null : order._id)}>
                                 <div className="order-info">
                                     <h3>Đơn hàng #{order.orderNumber}</h3>
                                     <p className="order-customer">
-                                        👤 {order.shippingAddress?.fullName} - {order.shippingAddress?.email}
+                                        <AppIcon name="user" size={15} /> {order.shippingAddress?.fullName} - {order.shippingAddress?.email}
                                     </p>
                                     <p className="order-date">
-                                        📅 {new Date(order.createdAt).toLocaleString('vi-VN')}
+                                        <AppIcon name="calendar" size={15} /> {new Date(order.createdAt).toLocaleString('vi-VN')}
                                     </p>
                                 </div>
                                 <div className="order-summary">
@@ -141,10 +141,10 @@ const OrdersManagement = () => {
                                     </span>
                                     <p className="order-total">{order.totalPrice.toLocaleString()}₫</p>
                                     <button className="expand-btn">
-                                        {expandedOrder === order._id ? '▲' : '▼'}
+                                        <AppIcon name="chevronDown" size={18} className={expandedOrder === order._id ? 'rotate-open' : ''} />
                                     </button>
                                 </div>
-                            </div>
+                            </button>
 
                             {expandedOrder === order._id && (
                                 <div className="order-details">

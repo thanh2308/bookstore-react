@@ -2,6 +2,7 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import CartItem from '../components/CartItem';
+import AppIcon from '../components/AppIcon';
 import './Cart.css';
 
 const Cart = () => {
@@ -13,7 +14,7 @@ const Cart = () => {
             <div className="empty-cart-page">
                 <div className="container">
                     <div className="empty-cart-content">
-                        <div className="empty-cart-icon">🛒</div>
+                        <div className="empty-cart-icon"><AppIcon name="cart" size={58} /></div>
                         <h2>Giỏ hàng trống</h2>
                         <p>Bạn chưa có sản phẩm nào trong giỏ hàng</p>
                         <Link to="/" className="btn btn-primary">
@@ -75,7 +76,7 @@ const Cart = () => {
                         </button>
 
                         <Link to="/" className="continue-shopping">
-                            ← Tiếp tục mua sắm
+                            Tiếp tục mua sắm
                         </Link>
                     </div>
                 </div>

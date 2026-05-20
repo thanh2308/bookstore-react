@@ -16,13 +16,13 @@ const PaymentResult = () => {
         const res = await api.get(`/payment/vnpay_return?${queryString}`);
 
         if (res.data.code === "00") {
-          setStatus("✅ Thanh toán thành công tuyệt đối!");
+          setStatus("Thanh toán thành công tuyệt đối!");
         } else {
-          setStatus("❌ Thanh toán thất bại hoặc đã bị hủy!");
+          setStatus("Thanh toán thất bại hoặc đã bị hủy!");
         }
       } catch (error) {
         console.error(error);
-        setStatus("⚠️ Lỗi xác thực chữ ký VNPay!");
+        setStatus("Lỗi xác thực chữ ký VNPay!");
       }
     };
 

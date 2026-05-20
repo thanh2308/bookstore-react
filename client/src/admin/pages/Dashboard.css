@@ -1,6 +1,19 @@
 .dashboard-page h1 {
     margin-bottom: 2rem;
-    color: #1f2937;
+    color: var(--text-primary);
+}
+
+.low-stock-alert {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 1.5rem;
+    padding: 0.9rem 1rem;
+    color: #991b1b;
+    background: #fee2e2;
+    border: 1px solid #fecaca;
+    border-radius: var(--radius-md);
+    font-weight: 800;
 }
 
 .stats-grid {
@@ -11,14 +24,15 @@
 }
 
 .stat-card {
-    background-color: white;
+    background-color: var(--card-bg);
     padding: 1.5rem;
-    border-radius: 1rem;
-    border-left: 4px solid;
+    border: 1px solid var(--border-color);
+    border-left: 4px solid var(--accent-color);
+    border-radius: var(--radius-lg);
     display: flex;
     align-items: center;
     gap: 1rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--card-shadow);
     transition: all 0.3s ease;
 }
 
@@ -37,13 +51,29 @@
     font-size: 2rem;
 }
 
+.stat-card-amber {
+    border-left-color: var(--accent-color);
+}
+
+.stat-card-green {
+    border-left-color: var(--success-color);
+}
+
+.stat-card-blue {
+    border-left-color: #2563eb;
+}
+
+.stat-card-stone {
+    border-left-color: var(--primary-color);
+}
+
 .stat-info {
     flex: 1;
 }
 
 .stat-label {
     margin: 0;
-    color: #6b7280;
+    color: var(--text-secondary);
     font-size: 0.875rem;
     font-weight: 500;
 }
@@ -52,24 +82,37 @@
     margin: 0.25rem 0 0 0;
     font-size: 2rem;
     font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.1;
 }
 
+.stat-trend {
+    display: inline-flex;
+    margin-top: 0.45rem;
+    color: var(--success-color);
+    font-size: 0.8rem;
+    font-weight: 800;
+}
+
+.dashboard-chart-row,
 .dashboard-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
     gap: 2rem;
+    margin-bottom: 2rem;
 }
 
 .dashboard-card {
-    background-color: white;
+    background-color: var(--card-bg);
     padding: 1.5rem;
-    border-radius: 1rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--card-shadow);
 }
 
 .dashboard-card h3 {
     margin: 0 0 1.5rem 0;
-    color: #1f2937;
+    color: var(--text-primary);
     font-size: 1.25rem;
 }
 
@@ -84,8 +127,9 @@
     align-items: center;
     gap: 1rem;
     padding: 1rem;
-    background-color: #f9fafb;
-    border-radius: 0.5rem;
+    background-color: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
 }
 
 .activity-icon {
@@ -99,12 +143,12 @@
 .activity-content p {
     margin: 0;
     font-weight: 500;
-    color: #374151;
+    color: var(--text-primary);
 }
 
 .activity-time {
     font-size: 0.875rem;
-    color: #9ca3af;
+    color: var(--text-muted);
 }
 
 .top-books-list {
@@ -118,12 +162,12 @@
     align-items: center;
     gap: 1rem;
     padding: 0.75rem;
-    border-radius: 0.5rem;
+    border-radius: var(--radius-md);
     transition: background-color 0.3s ease;
 }
 
 .top-book-item:hover {
-    background-color: #f3f4f6;
+    background-color: var(--bg-primary);
 }
 
 .top-book-item img {
@@ -140,22 +184,44 @@
 .top-book-title {
     margin: 0;
     font-weight: 600;
-    color: #1f2937;
+    color: var(--text-primary);
     font-size: 0.95rem;
 }
 
 .top-book-author {
     font-size: 0.875rem;
-    color: #6b7280;
+    color: var(--text-secondary);
 }
 
 .top-book-price {
     font-weight: 700;
-    color: #6366f1;
+    color: var(--secondary-color);
+}
+
+.dashboard-skeleton {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.dashboard-skeleton-card {
+    height: 120px;
+    border-radius: var(--radius-lg);
+}
+
+.dashboard-skeleton-chart {
+    grid-column: 1 / -1;
+    height: 320px;
+    border-radius: var(--radius-lg);
 }
 
 @media (max-width: 768px) {
     .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-chart-row,
+    .dashboard-skeleton {
         grid-template-columns: 1fr;
     }
 }

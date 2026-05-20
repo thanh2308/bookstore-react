@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
+import AppIcon from './AppIcon';
 import './Toast.css';
 
 const ToastContext = createContext();
@@ -35,10 +36,10 @@ export const ToastProvider = ({ children }) => {
                 {toasts.map(toast => (
                     <div key={toast.id} className={`toast toast-${toast.type}`}>
                         <span className="toast-icon">
-                            {toast.type === 'success' && '✓'}
-                            {toast.type === 'error' && '✕'}
-                            {toast.type === 'info' && 'ℹ'}
-                            {toast.type === 'warning' && '⚠️'}
+                            {toast.type === 'success' && <AppIcon name="checkCircle" size={18} />}
+                            {toast.type === 'error' && <AppIcon name="x" size={18} />}
+                            {toast.type === 'info' && <AppIcon name="bell" size={18} />}
+                            {toast.type === 'warning' && <AppIcon name="alert" size={18} />}
                         </span>
                         <span className="toast-message">{toast.message}</span>
                     </div>

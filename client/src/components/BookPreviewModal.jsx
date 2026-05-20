@@ -1,33 +1,34 @@
 import React, { useState } from 'react';
+import { getOptimizedImageUrl } from '../services/api';
+import AppIcon from './AppIcon';
 import './BookPreviewModal.css';
 
 const BookPreviewModal = ({ book, isOpen, onClose }) => {
+    const [currentPage, setCurrentPage] = useState(0);
+
     if (!isOpen) return null;
 
     const previewPages = [
-        book.image,
-        'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=600',
-        'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=600',
-        'https://images.unsplash.com/photo-1519682337058-a94d519337bc?w=600'
-    ];
-
-    const [currentPage, setCurrentPage] = useState(0);
+        getOptimizedImageUrl(book.coverImage || book.image, "w_700,f_auto,q_auto"),
+        ...(book.gallery || []).map((image) => getOptimizedImageUrl(image, "w_700,f_auto,q_auto")),
+    ].filter(Boolean);
+    const pages = previewPages.length > 0 ? previewPages : [""];
 
     return (
         <div className="modal-overlay" onClick={onClose}>
             <div className="preview-modal" onClick={(e) => e.stopPropagation()}>
-                <button className="modal-close" onClick={onClose}>✕</button>
+                <button className="modal-close" onClick={onClose} aria-label="Đóng xem nhanh"><AppIcon name="x" size={18} /></button>
 
                 <div className="preview-header">
                     <h2>{book.title}</h2>
                     <p>Tác giả: {book.author}</p>
-                    <span className="preview-badge">Đọc thử miễn phí</span>
+                    <span className="preview-badge">Xem nhanh</span>
                 </div>
 
                 <div className="preview-content">
                     <img
-                        src={previewPages[currentPage]}
-                        alt=""
+                        src={pages[currentPage]}
+                        alt={book.title}
                         className="preview-page"
                     />
                 </div>
@@ -38,26 +39,26 @@ const BookPreviewModal = ({ book, isOpen, onClose }) => {
                         onClick={() => setCurrentPage(Math.max(0, currentPage - 1))}
                         disabled={currentPage === 0}
                     >
-                        <span className="icon">←</span>
+                        <span className="icon"><AppIcon name="chevronLeft" size={17} /></span>
                         Trang trước
                     </button>
 
                     <span className="page-indicator">
-                        Trang {currentPage + 1} / {previewPages.length}
+                        Trang {currentPage + 1} / {pages.length}
                     </span>
 
                     <button
                         className="nav-btn next"
-                        onClick={() => setCurrentPage(Math.min(previewPages.length - 1, currentPage + 1))}
-                        disabled={currentPage === previewPages.length - 1}
+                        onClick={() => setCurrentPage(Math.min(pages.length - 1, currentPage + 1))}
+                        disabled={currentPage === pages.length - 1}
                     >
                         Trang sau
-                        <span className="icon">→</span>
+                        <span className="icon"><AppIcon name="chevronRight" size={17} /></span>
                     </button>
                 </div>
 
                 <div className="preview-footer">
-                    <p>Đọc thử {previewPages.length} trang đầu</p>
+                    <p>Xem nhanh bìa và thông tin sách trước khi mở trang chi tiết.</p>
                 </div>
             </div>
         </div>

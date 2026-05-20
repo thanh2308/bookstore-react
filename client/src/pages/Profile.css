@@ -2,7 +2,7 @@
 .profile-page {
     padding-top: 2rem;
     padding-bottom: 3rem;
-    background-color: #f4f6f9; 
+    background-color: var(--bg-secondary); 
 }
 
 .profile-container {
@@ -20,9 +20,9 @@
 /* 📌 CỘT TRÁI: SIDEBAR */
 .profile-sidebar {
     width: 320px; 
-    background: white;
+    background: var(--card-bg);
     border-radius: 1rem;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--card-shadow);
     padding: 0; 
     flex-shrink: 0;
     position: sticky;
@@ -35,13 +35,13 @@
     position: relative;
     padding: 0 1.5rem 1.5rem 1.5rem;
     text-align: center;
-    border-bottom: 1px solid #f3f4f6;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .avatar-banner-bg {
     width: 100%;
     height: 100px;
-    background: linear-gradient(135deg, #c7d2fe 0%, #a5b4fc 100%);
+    background: var(--brand-gradient);
     position: absolute;
     top: 0;
     left: 0;
@@ -72,7 +72,7 @@
 
 .avatar-info h3 {
     margin: 0;
-    color: #1f2937;
+    color: var(--text-primary);
     font-size: 1.25rem;
     font-weight: 700;
     line-height: 1.2;
@@ -80,7 +80,7 @@
 
 .avatar-info .avatar-title {
     margin: 5px 0 0 0;
-    color: #6b7280;
+    color: var(--text-secondary);
     font-size: 0.9rem;
     font-weight: 500;
 }
@@ -91,7 +91,7 @@
     grid-template-columns: repeat(3, 1fr);
     gap: 0.75rem;
     padding: 1.5rem;
-    border-bottom: 1px solid #f3f4f6;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .stat-card {
@@ -100,9 +100,9 @@
     justify-content: center;
     align-items: center;
     padding: 0.85rem 0.5rem;
-    background-color: white !important;
+    background-color: var(--card-bg) !important;
     border-radius: 0.5rem !important;
-    border: 1px solid #e5e7eb !important; 
+    border: 1px solid var(--border-color) !important; 
     box-shadow: 0 1px 2px rgba(0,0,0,0.02) !important;
     outline: none !important;
 }
@@ -110,14 +110,14 @@
 .stat-card h4 {
     margin: 0 0 4px 0 !important;
     font-size: 1.2rem;
-    color: #1f2937;
+    color: var(--text-primary);
     font-weight: 700;
 }
 
 .stat-card p {
     margin: 0 !important;
     font-size: 0.85rem;
-    color: #6b7280;
+    color: var(--text-secondary);
     font-weight: 500;
 }
 
@@ -133,12 +133,12 @@
     width: 100%;
     text-align: left;
     padding: 0.85rem 1.5rem;
-    border: 1px solid #e5e7eb !important;
-    background-color: white !important;
-    border-radius: 9999px !important; 
+    border: 1px solid var(--border-color) !important;
+    background-color: var(--card-bg) !important;
+    border-radius: var(--radius-md) !important; 
     font-weight: 500;
     font-size: 1rem;
-    color: #4b5563 !important;
+    color: var(--text-secondary) !important;
     cursor: pointer;
     transition: all 0.2s ease;
     text-decoration: none;
@@ -149,17 +149,17 @@
 }
 
 .profile-tab:hover {
-    border-color: #a5b4fc !important;
-    color: #6366f1 !important;
+    border-color: rgba(180, 83, 9, 0.35) !important;
+    color: var(--accent-color) !important;
 }
 
 /* Tab Đang Chọn */
 .profile-tab.active {
-    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
+    background: var(--brand-gradient) !important;
     color: white !important;
     border: 1px solid transparent !important; /* Triệt tiêu viền */
     outline: none !important;
-    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3) !important;
+    box-shadow: 0 4px 12px rgba(28, 25, 23, 0.18) !important;
 }
 
 /* 📌 CỘT PHẢI: FORM NỘI DUNG */
@@ -168,9 +168,9 @@
 }
 
 .content-card {
-    background: white;
+    background: var(--card-bg);
     border-radius: 1rem;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--card-shadow);
     padding: 2.5rem;
     min-height: 500px;
 }
@@ -178,19 +178,19 @@
 .content-card-header {
     margin-bottom: 2rem;
     padding-bottom: 1.5rem;
-    border-bottom: 1px solid #f3f4f6;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .content-card-header h2 {
     margin: 0;
-    color: #1f2937;
+    color: var(--text-primary);
     font-size: 1.5rem;
     font-weight: 700;
 }
 
 .content-card-header .subtitle {
     margin: 5px 0 0 0;
-    color: #6b7280;
+    color: var(--text-secondary);
     font-size: 1rem;
 }
 
@@ -203,29 +203,29 @@
     display: block;
     margin-bottom: 0.5rem;
     font-weight: 600;
-    color: #374151;
+    color: var(--text-primary);
 }
 
 .custom-input {
     width: 100%;
     padding: 0.75rem 1.25rem;
-    border: 1px solid #d1d5db;
+    border: 1px solid var(--input-border);
     border-radius: 0.5rem; 
     font-size: 1rem;
     transition: all 0.3s ease;
-    background-color: white;
+    background-color: var(--input-bg);
     box-sizing: border-box;
 }
 
 .custom-input:focus {
     outline: none;
-    border-color: #6366f1;
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(180, 83, 9, 0.14);
 }
 
 .custom-input:disabled {
-    background-color: #f3f4f6;
-    color: #9ca3af;
+    background-color: var(--bg-tertiary);
+    color: var(--text-muted);
     cursor: not-allowed;
 }
 
@@ -234,19 +234,19 @@
     width: 100%;
     padding: 1rem;
     border: none;
-    border-radius: 9999px; 
-    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    border-radius: var(--radius-md); 
+    background: var(--brand-gradient);
     color: white;
     font-size: 1.1rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
     margin-top: 1rem;
-    box-shadow: 0 4px 6px rgba(99, 102, 241, 0.2);
+    box-shadow: 0 4px 6px rgba(28, 25, 23, 0.16);
 }
 
 .btn-gradient:hover {
-    box-shadow: 0 6px 12px rgba(99, 102, 241, 0.4);
+    box-shadow: 0 6px 12px rgba(28, 25, 23, 0.22);
     transform: translateY(-2px);
 }
 
@@ -256,24 +256,24 @@
     justify-content: space-between;
     align-items: center;
     padding: 1.25rem;
-    border: 1px solid #e5e7eb;
-    border-radius: 0.5rem; 
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md); 
     margin-bottom: 1rem;
-    background-color: #f9fafb;
+    background-color: var(--bg-primary);
 }
 
 .address-info p {
     margin: 0.25rem 0;
-    color: #4b5563;
+    color: var(--text-secondary);
 }
 
 .btn-outline-gradient {
     width: 100%;
     padding: 1rem;
-    border: 2px dashed #a5b4fc;
+    border: 2px dashed rgba(180, 83, 9, 0.35);
     border-radius: 0.5rem;
     background-color: transparent;
-    color: #4f46e5;
+    color: var(--accent-color);
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
@@ -281,8 +281,50 @@
 }
 
 .btn-outline-gradient:hover {
-    border-color: #4f46e5;
-    background-color: #eef2ff;
+    border-color: var(--accent-color);
+    background-color: #fff7ed;
+}
+
+.address-form {
+    margin-top: 1.25rem;
+    padding: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: var(--bg-primary);
+}
+
+.address-form-header,
+.form-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.address-form-header {
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.address-form-header h4 {
+    margin: 0;
+}
+
+.locate-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.45rem 0.75rem;
+    color: var(--success-color);
+    background: #ecfdf5;
+    border: 1px solid rgba(4, 120, 87, 0.28);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-size: 0.86rem;
+    font-weight: 700;
+}
+
+.add-address-btn {
+    margin-top: 1rem;
 }
 
 .fade-in {

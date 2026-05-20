@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { updateProfile, changePassword } from '../redux/authSlice';
 import { useToast } from '../components/Toast';
+import AppIcon from '../components/AppIcon';
 import './Profile.css';
 
 const Profile = () => {
@@ -130,7 +131,7 @@ const Profile = () => {
         );
     };
 
-    const avatarUrl = user?.avatar ? user.avatar : `https://ui-avatars.com/api/?name=${user?.name || 'User'}&background=6366f1&color=fff&size=120`;
+    const avatarUrl = user?.avatar ? user.avatar : `https://ui-avatars.com/api/?name=${user?.name || 'User'}&background=1C1917&color=fff&size=120`;
 
     return (
         <div className="profile-page">
@@ -199,7 +200,7 @@ const Profile = () => {
                                 <div className="content-card">
                                     <div className="content-card-header">
                                         <div className="header-info">
-                                            <h2>👤 Thông Tin Cá Nhân</h2>
+                                            <h2><AppIcon name="user" size={22} /> Thông Tin Cá Nhân</h2>
                                             <p className="subtitle">Cập nhật hồ sơ của bạn</p>
                                         </div>
                                     </div>
@@ -243,7 +244,7 @@ const Profile = () => {
                                 <div className="content-card">
                                     <div className="content-card-header">
                                         <div className="header-info">
-                                            <h2>🔒 Đổi Mật Khẩu</h2>
+                                            <h2><AppIcon name="lock" size={22} /> Đổi Mật Khẩu</h2>
                                             <p className="subtitle">Bảo mật tài khoản</p>
                                         </div>
                                     </div>
@@ -295,12 +296,12 @@ const Profile = () => {
                             <div className="tab-pane fade-in">
                                 <div className="content-card address-content-card">
                                     <div className="content-card-header">
-                                        <h2>📍 Sổ Địa Chỉ</h2>
+                                        <h2><AppIcon name="mapPin" size={22} /> Sổ Địa Chỉ</h2>
                                     </div>
                                     
                                     {user?.addresses?.length > 0 ? (
                                         user.addresses.map((addr, index) => (
-                                            <div key={index} className="address-card" style={{ padding: '15px', border: '1px solid #e5e7eb', borderRadius: '8px', marginBottom: '10px' }}>
+                                            <div key={index} className="address-card">
                                                 <div className="address-info">
                                                     <p><strong>{addr.fullName || user.name}</strong> | {addr.phone || user.phone}</p>
                                                     <p>{addr.address}, {addr.city}</p>
@@ -308,7 +309,7 @@ const Profile = () => {
                                             </div>
                                         ))
                                     ) : (
-                                        <div className="address-card" style={{ padding: '15px', border: '1px solid #e5e7eb', borderRadius: '8px', marginBottom: '10px' }}>
+                                        <div className="address-card">
                                             <div className="address-info">
                                                 <p>Chưa có địa chỉ nào được lưu.</p>
                                             </div>
@@ -316,17 +317,17 @@ const Profile = () => {
                                     )}
 
                                     {showAddressForm ? (
-                                        <form onSubmit={handleAddressSubmit} className="custom-form" style={{ marginTop: '20px', padding: '15px', border: '1px solid #e5e7eb', borderRadius: '8px', background: '#f9fafb' }}>
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-                                                <h4 style={{ margin: 0 }}>Thêm địa chỉ nhận hàng</h4>
+                                        <form onSubmit={handleAddressSubmit} className="custom-form address-form">
+                                            <div className="address-form-header">
+                                                <h4>Thêm địa chỉ nhận hàng</h4>
                                                 
                                                 <button 
                                                     type="button" 
                                                     onClick={handleGetLocation}
                                                     disabled={isLocating}
-                                                    style={{ background: '#ecfdf5', color: '#059669', border: '1px solid #34d399', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px', fontSize: '13px' }}
+                                                    className="locate-btn"
                                                 >
-                                                    {isLocating ? '⏳ Đang định vị...' : '📍 Lấy vị trí hiện tại'}
+                                                    {isLocating ? <><AppIcon name="clock" size={15} /> Đang định vị...</> : <><AppIcon name="mapPin" size={15} /> Lấy vị trí hiện tại</>}
                                                 </button>
                                             </div>
 
@@ -374,7 +375,7 @@ const Profile = () => {
                                                     disabled={loading}
                                                 />
                                             </div>
-                                            <div style={{ display: 'flex', gap: '10px' }}>
+                                            <div className="form-actions">
                                                 <button type="submit" className="btn-gradient" disabled={loading}>
                                                     {loading ? 'Đang lưu...' : 'Lưu địa chỉ'}
                                                 </button>
@@ -384,7 +385,7 @@ const Profile = () => {
                                             </div>
                                         </form>
                                     ) : (
-                                        <button className="btn-outline-gradient" style={{ marginTop: '15px' }} onClick={() => setShowAddressForm(true)}>
+                                        <button className="btn-outline-gradient add-address-btn" onClick={() => setShowAddressForm(true)}>
                                             + Thêm địa chỉ mới
                                         </button>
                                     )}

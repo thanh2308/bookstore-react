@@ -5,6 +5,8 @@ import { fetchWishlist, toggleWishlistItem } from "../redux/wishlistSlice";
 import { addToCart } from "../redux/cartSlice";
 import { useToast } from "../components/Toast";
 import { getDisplayRating, getReviewCount } from "../utils/bookReviewUtils";
+import { getOptimizedImageUrl } from "../services/api";
+import AppIcon from "../components/AppIcon";
 import "./Wishlist.css";
 
 const Wishlist = () => {
@@ -43,16 +45,21 @@ const Wishlist = () => {
   };
 
   const handleViewDetails = (bookId) => {
-    navigate(`/book/${bookId}`);
+    navigate(`/books/${bookId}`);
   };
 
   if (loading) {
     return (
       <div className="container">
-        <div className="loading-state">
-          <div className="spinner"></div>
-          <p>Đang tải wishlist...</p>
-        </div>
+          <div className="wishlist-skeleton-grid" aria-label="Đang tải wishlist">
+            {[1, 2, 3].map((item) => (
+              <div className="wishlist-skeleton" key={item}>
+                <span className="skeleton wishlist-skeleton-image" />
+                <span className="skeleton wishlist-skeleton-line wide" />
+                <span className="skeleton wishlist-skeleton-line" />
+              </div>
+            ))}
+          </div>
       </div>
     );
   }
@@ -61,7 +68,7 @@ const Wishlist = () => {
     return (
       <div className="container">
         <div className="error-state">
-          <p>❌ {error}</p>
+          <p><AppIcon name="alert" size={18} /> {error}</p>
           <button
             onClick={() => dispatch(fetchWishlist())}
             className="btn btn-primary"
@@ -83,7 +90,7 @@ const Wishlist = () => {
 
         {wishlistBooks.length === 0 ? (
           <div className="empty-wishlist">
-            <div className="empty-icon">💔</div>
+            <div className="empty-icon"><AppIcon name="heart" size={42} /></div>
             <h2>Danh sách yêu thích trống</h2>
             <p>Bạn chưa thêm sách nào vào danh sách yêu thích.</p>
             <button onClick={() => navigate("/")} className="btn btn-primary">
@@ -95,17 +102,17 @@ const Wishlist = () => {
             {wishlistBooks.map((book) => (
               <div key={book._id || book.id} className="wishlist-item">
                 <div className="wishlist-item-image">
-                  <img src={book.image} alt={book.title} />
+                  <img src={getOptimizedImageUrl(book.coverImage || book.image, "w_320,f_auto,q_auto")} alt={book.title} />
                   {!book.inStock && (
                     <div className="out-of-stock-overlay">Hết hàng</div>
                   )}
                 </div>
 
                 <div className="wishlist-item-details">
-                  <h3>{book.title}</h3>
+                  <h3 onClick={() => handleViewDetails(book._id || book.id)}>{book.title}</h3>
                   <p className="author">{book.author}</p>
                   <div className="rating">
-                    <span className="stars">⭐ {getDisplayRating(book)}</span>
+                    <span className="stars"><AppIcon name="star" size={15} fill="currentColor" /> {getDisplayRating(book)}</span>
                     <span className="reviews">
                       ({getReviewCount(book)} đánh giá)
                     </span>
@@ -128,7 +135,7 @@ const Wishlist = () => {
                     className={`btn ${book.inStock ? "btn-primary" : "btn-secondary"}`}
                     disabled={!book.inStock}
                   >
-                    {book.inStock ? "🛒 Thêm vào giỏ hàng" : "Hết hàng"}
+                    {book.inStock ? <><AppIcon name="cart" size={16} /> Thêm vào giỏ hàng</> : "Hết hàng"}
                   </button>
                   <button
                     onClick={() => handleViewDetails(book._id || book.id)}
@@ -140,7 +147,7 @@ const Wishlist = () => {
                     onClick={() => handleRemove(book._id || book.id)}
                     className="btn btn-danger"
                   >
-                    ❌ Xóa
+                    <AppIcon name="trash" size={16} /> Xóa
                   </button>
                 </div>
               </div>
@@ -160,7 +167,7 @@ const Wishlist = () => {
               }}
               className="btn btn-primary"
             >
-              🛒 Thêm tất cả vào giỏ hàng
+              <AppIcon name="cart" size={16} /> Thêm tất cả vào giỏ hàng
             </button>
             <button onClick={() => navigate("/")} className="btn btn-outline">
               Tiếp tục mua sắm

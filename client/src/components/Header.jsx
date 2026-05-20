@@ -1,16 +1,21 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Link, NavLink, useLocation } from 'react-router-dom';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../redux/authSlice';
 import { fetchMyOrders } from '../redux/ordersSlice';
 import { useTheme } from '../contexts/ThemeContext';
+import AppIcon from './AppIcon';
 import './Header.css';
 
 const Header = () => {
     const dispatch = useDispatch();
     const location = useLocation();
+    const navigate = useNavigate();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
+    const [hasScrolled, setHasScrolled] = useState(false);
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
+    const [searchTerm, setSearchTerm] = useState("");
     const dropdownRef = useRef(null);
     const { isDark, toggleTheme } = useTheme();
 
@@ -18,6 +23,13 @@ const Header = () => {
     const wishlistCount = useSelector(state => state.wishlist.wishlist?.length || 0);
     const orderCount = useSelector(state => state.orders.myOrders?.length || 0);
     const { isAuthenticated, user } = useSelector(state => state.auth);
+
+    useEffect(() => {
+        const handleScroll = () => setHasScrolled(window.scrollY > 60);
+        handleScroll();
+        window.addEventListener("scroll", handleScroll, { passive: true });
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
 
     // Fetch orders khi login
     useEffect(() => {
@@ -30,6 +42,7 @@ const Header = () => {
     useEffect(() => {
         setIsMobileMenuOpen(false);
         setIsUserDropdownOpen(false);
+        setIsSearchOpen(false);
     }, [location.pathname]);
 
     // Khóa scroll body khi mobile menu mở
@@ -66,16 +79,24 @@ const Header = () => {
         closeMenus();
     };
 
+    const handleSearchSubmit = (event) => {
+        event.preventDefault();
+        const query = searchTerm.trim();
+        if (query) {
+            navigate(`/?search=${encodeURIComponent(query)}`);
+        }
+    };
+
     const isAdmin = user?.role === 'admin';
     const avatarLetter = user?.name?.[0]?.toUpperCase() || '?';
 
     return (
-        <header className="header">
+        <header className={`header ${hasScrolled ? "is-scrolled" : ""}`}>
             <div className="container">
                 <nav className="navbar">
                     {/* ── Logo ── */}
                     <Link to="/" className="logo">
-                        <span className="logo-icon">📚</span>
+                        <span className="logo-icon"><AppIcon name="book" size={22} /></span>
                         <span className="logo-text">BookStore</span>
                     </Link>
 
@@ -86,15 +107,16 @@ const Header = () => {
                                 Trang chủ
                             </NavLink>
                         </li>
+                        
                         <li>
                             <NavLink to="/ai" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
-                                🤖 BookAI
+                                AI Chat
                             </NavLink>
                         </li>
                         {isAdmin && (
                             <li>
                                 <NavLink to="/admin/dashboard" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
-                                    🎛️ Admin Panel
+                                    <AppIcon name="dashboard" size={16} /> Admin Panel
                                 </NavLink>
                             </li>
                         )}
@@ -108,7 +130,7 @@ const Header = () => {
                                 </li>
                                 <li>
                                     <NavLink to="/my-orders" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
-                                        📦 Đơn hàng
+                                        <AppIcon name="package" size={16} /> Đơn hàng
                                         {orderCount > 0 && <span className="nav-badge">{orderCount}</span>}
                                     </NavLink>
                                 </li>
@@ -119,15 +141,31 @@ const Header = () => {
                     {/* ── Desktop right actions ── */}
                     <div className="nav-right">
                         {/* ── Theme Toggle ── */}
+                        <form className={`header-search ${isSearchOpen ? "is-open" : ""}`} onSubmit={handleSearchSubmit}>
+                            <input
+                                value={searchTerm}
+                                onChange={(event) => setSearchTerm(event.target.value)}
+                                placeholder="Tìm sách, tác giả..."
+                                aria-label="Tìm kiếm sách"
+                            />
+                            <button
+                                type={isSearchOpen ? "submit" : "button"}
+                                onClick={() => setIsSearchOpen(true)}
+                                aria-label="Mở tìm kiếm"
+                            >
+                                <AppIcon name="search" size={18} />
+                            </button>
+                        </form>
+
                         <button
-                            className={`theme-toggle-btn${isDark ? ' is-dark' : ''}`}
+                            className={`theme-toggle-btn header-theme-toggle${isDark ? ' is-dark' : ''}`}
                             onClick={toggleTheme}
                             aria-label={isDark ? 'Chuyển sang Light Mode' : 'Chuyển sang Dark Mode'}
                             title={isDark ? 'Light Mode' : 'Dark Mode'}
                         >
                             <div className="theme-toggle-track">
                                 <span className="theme-toggle-thumb">
-                                    {isDark ? '🌙' : '☀️'}
+                                    <AppIcon name={isDark ? 'moon' : 'sun'} size={13} />
                                 </span>
                             </div>
                         </button>
@@ -135,7 +173,7 @@ const Header = () => {
                         {!isAdmin && (
                             <Link to="/cart" className="cart-icon-wrapper" aria-label="Giỏ hàng">
                                 <div className="cart-icon">
-                                    🛒
+                                    <AppIcon name="cart" size={24} />
                                     {cartQuantity > 0 && <span className="cart-count">{cartQuantity}</span>}
                                 </div>
                             </Link>
@@ -151,7 +189,7 @@ const Header = () => {
                                 >
                                     <div className="user-avatar">{avatarLetter}</div>
                                     <span className="user-name">{user.name}</span>
-                                    <span className={`dropdown-arrow ${isUserDropdownOpen ? 'open' : ''}`}>▼</span>
+                                    <AppIcon name="chevronDown" size={14} className={`dropdown-arrow ${isUserDropdownOpen ? 'open' : ''}`} />
                                 </button>
 
                                 {isUserDropdownOpen && (
@@ -165,16 +203,16 @@ const Header = () => {
                                         </div>
                                         <div className="dropdown-divider" />
                                         <Link to="/profile" className="dropdown-item" onClick={closeMenus} role="menuitem">
-                                            👤 Thông tin cá nhân
+                                            <AppIcon name="user" size={16} /> Thông tin cá nhân
                                         </Link>
                                         {!isAdmin && (
                                             <Link to="/my-orders" className="dropdown-item" onClick={closeMenus} role="menuitem">
-                                                📦 Đơn hàng của tôi
+                                                <AppIcon name="package" size={16} /> Đơn hàng của tôi
                                             </Link>
                                         )}
                                         <div className="dropdown-divider" />
                                         <button onClick={handleLogout} className="dropdown-item dropdown-logout" role="menuitem">
-                                            🚪 Đăng xuất
+                                            <AppIcon name="logout" size={16} /> Đăng xuất
                                         </button>
                                     </div>
                                 )}
@@ -206,18 +244,15 @@ const Header = () => {
                     />
 
                     {/* ── Mobile drawer panel ── */}
-                    <div className={`mobile-drawer ${isMobileMenuOpen ? 'open' : ''}`} role="dialog" aria-label="Navigation menu">
+                    <div className={`mobile-drawer ${isMobileMenuOpen ? 'open' : ''}`} role="dialog" aria-modal="true" aria-label="Navigation menu">
                         {/* Drawer header */}
                         <div className="drawer-header">
                             <Link to="/" className="drawer-logo" onClick={closeMenus}>
-                                <span>📚</span>
+                                <AppIcon name="book" size={20} />
                                 <span>BookStore</span>
                             </Link>
                             <button className="drawer-close-btn" onClick={closeMenus} aria-label="Đóng menu">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-                                    <line x1="18" y1="6" x2="6" y2="18" />
-                                    <line x1="6" y1="6" x2="18" y2="18" />
-                                </svg>
+                                <AppIcon name="x" size={20} strokeWidth={2.5} />
                             </button>
                         </div>
 
@@ -235,47 +270,47 @@ const Header = () => {
                         {/* Nav links */}
                         <nav className="drawer-nav">
                             <Link to="/" className="drawer-link" onClick={closeMenus}>
-                                <span className="drawer-link-icon">🏠</span>
+                                <span className="drawer-link-icon"><AppIcon name="home" size={18} /></span>
                                 Trang chủ
                             </Link>
 
                             <Link to="/ai" className="drawer-link" onClick={closeMenus}>
-                                <span className="drawer-link-icon">🤖</span>
-                                BookAI
+                                <span className="drawer-link-icon"><AppIcon name="bot" size={18} /></span>
+                                AI Chat
                             </Link>
 
                             {/* Theme Toggle in Drawer */}
-                            <button className="drawer-link" onClick={toggleTheme} style={{ justifyContent: 'space-between' }}>
-                                <span style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                                    <span className="drawer-link-icon">{isDark ? '🌙' : '☀️'}</span>
+                            <button className="drawer-link drawer-theme-row" onClick={toggleTheme}>
+                                <span className="drawer-theme-label">
+                                    <span className="drawer-link-icon"><AppIcon name={isDark ? 'moon' : 'sun'} size={18} /></span>
                                     {isDark ? 'Dark Mode' : 'Light Mode'}
                                 </span>
-                                <span className={`theme-toggle-btn${isDark ? ' is-dark' : ''}`} style={{ pointerEvents: 'none', flexShrink: 0 }}>
+                                <span className={`theme-toggle-btn drawer-theme-toggle${isDark ? ' is-dark' : ''}`} aria-hidden="true">
                                     <span className="theme-toggle-track">
-                                        <span className="theme-toggle-thumb">{isDark ? '🌙' : '☀️'}</span>
+                                        <span className="theme-toggle-thumb"><AppIcon name={isDark ? 'moon' : 'sun'} size={13} /></span>
                                     </span>
                                 </span>
                             </button>
 
                             {isAdmin ? (
                                 <Link to="/admin/dashboard" className="drawer-link" onClick={closeMenus}>
-                                    <span className="drawer-link-icon">🎛️</span>
+                                    <span className="drawer-link-icon"><AppIcon name="dashboard" size={18} /></span>
                                     Admin Panel
                                 </Link>
                             ) : (
                                 <>
                                     <Link to="/wishlist" className="drawer-link" onClick={closeMenus}>
-                                        <span className="drawer-link-icon">❤️</span>
+                                        <span className="drawer-link-icon"><AppIcon name="heart" size={18} /></span>
                                         Yêu thích
                                         {wishlistCount > 0 && <span className="drawer-badge">{wishlistCount}</span>}
                                     </Link>
                                     <Link to="/my-orders" className="drawer-link" onClick={closeMenus}>
-                                        <span className="drawer-link-icon">📦</span>
+                                        <span className="drawer-link-icon"><AppIcon name="package" size={18} /></span>
                                         Đơn hàng của tôi
                                         {orderCount > 0 && <span className="drawer-badge">{orderCount}</span>}
                                     </Link>
                                     <Link to="/cart" className="drawer-link" onClick={closeMenus}>
-                                        <span className="drawer-link-icon">🛒</span>
+                                        <span className="drawer-link-icon"><AppIcon name="cart" size={18} /></span>
                                         Giỏ hàng
                                         {cartQuantity > 0 && <span className="drawer-badge">{cartQuantity}</span>}
                                     </Link>
@@ -286,11 +321,11 @@ const Header = () => {
                                 <>
                                     <div className="drawer-divider" />
                                     <Link to="/profile" className="drawer-link" onClick={closeMenus}>
-                                        <span className="drawer-link-icon">👤</span>
+                                        <span className="drawer-link-icon"><AppIcon name="user" size={18} /></span>
                                         Thông tin cá nhân
                                     </Link>
                                     <button className="drawer-link drawer-logout" onClick={handleLogout}>
-                                        <span className="drawer-link-icon">🚪</span>
+                                        <span className="drawer-link-icon"><AppIcon name="logout" size={18} /></span>
                                         Đăng xuất
                                     </button>
                                 </>

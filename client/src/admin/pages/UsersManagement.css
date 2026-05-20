@@ -10,13 +10,14 @@
 }
 
 .stat-card-small {
-    background-color: white;
+    background-color: var(--card-bg);
     padding: 1.5rem;
-    border-radius: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
     display: flex;
     align-items: center;
     gap: 1rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--card-shadow);
 }
 
 .stat-card-small .stat-icon {
@@ -25,19 +26,20 @@
 
 .stat-card-small p {
     margin: 0;
-    color: #6b7280;
+    color: var(--text-secondary);
     font-size: 0.875rem;
 }
 
 .stat-card-small h3 {
     margin: 0.25rem 0 0 0;
     font-size: 1.75rem;
-    color: #1f2937;
+    color: var(--text-primary);
 }
 
 .users-table-container {
-    background-color: white;
-    border-radius: 1rem;
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
     overflow: hidden;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
@@ -48,35 +50,35 @@
 }
 
 .users-table thead {
-    background-color: #f9fafb;
+    background-color: var(--bg-primary);
 }
 
 .users-table th {
     padding: 1rem;
     text-align: left;
     font-weight: 600;
-    color: #374151;
-    border-bottom: 2px solid #e5e7eb;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-color);
 }
 
 .users-table td {
     padding: 1rem;
-    border-bottom: 1px solid #f3f4f6;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .users-table tbody tr:hover {
-    background-color: #f9fafb;
+    background-color: var(--bg-primary);
 }
 
 .user-name-cell {
     font-weight: 600;
-    color: #1f2937;
+    color: var(--text-primary);
 }
 
 .role-select {
     padding: 0.5rem 0.75rem;
-    border: 2px solid #e5e7eb;
-    border-radius: 0.375rem;
+    border: 1px solid var(--input-border);
+    border-radius: var(--radius-md);
     font-weight: 500;
     cursor: pointer;
 }
@@ -101,7 +103,7 @@
 
 .orders-count {
     font-weight: 600;
-    color: #6366f1;
+    color: var(--secondary-color);
 }
 
 .btn-toggle {
@@ -138,4 +140,20 @@
     .users-table {
         font-size: 0.875rem;
     }
+}
+
+.block-reason-label {
+    display: grid;
+    gap: 0.45rem;
+    margin-top: 1rem;
+    color: var(--text-primary);
+    font-weight: 700;
+}
+
+.block-reason-label textarea {
+    min-height: 88px;
+    resize: vertical;
+    padding: 0.75rem;
+    border: 1px solid var(--input-border);
+    border-radius: var(--radius-md);
 }

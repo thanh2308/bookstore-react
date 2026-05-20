@@ -4,23 +4,33 @@ const ThemeContext = createContext(null);
 
 export const ThemeProvider = ({ children }) => {
     const [isDark, setIsDark] = useState(() => {
-        // Lấy preference từ localStorage, fallback về system preference
         const saved = localStorage.getItem('bookstore-theme');
         if (saved) return saved === 'dark';
         return window.matchMedia('(prefers-color-scheme: dark)').matches;
     });
 
+    // Apply theme to document
     useEffect(() => {
-        // Áp dụng class lên <html> element
         const root = document.documentElement;
         if (isDark) {
             root.setAttribute('data-theme', 'dark');
         } else {
             root.removeAttribute('data-theme');
         }
-        // Lưu vào localStorage
         localStorage.setItem('bookstore-theme', isDark ? 'dark' : 'light');
     }, [isDark]);
+
+    // Listen to system theme changes
+    useEffect(() => {
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        const handleChange = (e) => {
+            if (!localStorage.getItem('bookstore-theme')) {
+                setIsDark(e.matches);
+            }
+        };
+        mediaQuery.addEventListener('change', handleChange);
+        return () => mediaQuery.removeEventListener('change', handleChange);
+    }, []);
 
     const toggleTheme = () => setIsDark(prev => !prev);
 
